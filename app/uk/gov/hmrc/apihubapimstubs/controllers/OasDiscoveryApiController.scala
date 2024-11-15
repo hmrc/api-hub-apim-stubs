@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
 import uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi.{ApiDeployment, ApiDeploymentDetail}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -28,14 +29,15 @@ import java.time.Clock
 @Singleton
 class OasDiscoveryApiController @Inject()(
   cc: ControllerComponents,
-  clock: Clock
+  clock: Clock,
+  authenticator: Authenticator
 ) extends BackendController(cc) with Logging {
 
-  def getOpenApiDeployments(): Action[AnyContent] = Action {
+  def getOpenApiDeployments(): Action[AnyContent] = authenticator {
     Ok(Json.toJson(ApiDeployment.cannedResponse))
   }
 
-  def getOpenApiDeployment(id: String): Action[AnyContent] = Action {
+  def getOpenApiDeployment(id: String): Action[AnyContent] = authenticator {
     Ok(Json.toJson(ApiDeploymentDetail(id, clock)))
   }
 

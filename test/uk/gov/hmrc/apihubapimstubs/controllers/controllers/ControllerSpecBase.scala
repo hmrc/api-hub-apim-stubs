@@ -20,12 +20,11 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.ControllerComponents
 import play.api.test.Helpers
 import play.api.test.Helpers.AUTHORIZATION
-import play.api.{Application => PlayApplication}
 import uk.gov.hmrc.apihubapimstubs.services.IdmsService
 
 import java.time.{Clock, Instant, ZoneId}
@@ -36,7 +35,7 @@ trait ControllerSpecBase extends AnyFreeSpec with Matchers with MockitoSugar wit
   val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
   case class Fixture(
-    application: PlayApplication,
+    application: Application,
     idmsService: IdmsService
   )
 
@@ -45,7 +44,6 @@ trait ControllerSpecBase extends AnyFreeSpec with Matchers with MockitoSugar wit
 
     val application = new GuiceApplicationBuilder()
       .overrides(
-        bind[ControllerComponents].toInstance(Helpers.stubControllerComponents()),
         bind[Clock].toInstance(clock),
         bind[IdmsService].toInstance(idmsService)
       )
@@ -53,13 +51,5 @@ trait ControllerSpecBase extends AnyFreeSpec with Matchers with MockitoSugar wit
 
     Fixture(application, idmsService)
   }
-
-//  def buildApplication(): PlayApplication = {
-//    new GuiceApplicationBuilder()
-//      .overrides(
-//        bind[ControllerComponents].toInstance(Helpers.stubControllerComponents()),
-//      )
-//      .build()
-//  }
 
 }

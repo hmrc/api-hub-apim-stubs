@@ -38,9 +38,9 @@ class IdmsController @Inject()(
     implicit request =>
       request.body.validate[Client] match {
         case JsSuccess(client, _) =>
-          logger.info(s"Creating client: ${Json.prettyPrint(Json.toJson(client))}")
+          logger.info(s"Creating client: $client")
           identityService.createClient(Identity(client)).map {
-            case Some(clientResonse) => Created(Json.toJson(clientResonse))
+            case Some(clientResponse) => Created(Json.toJson(clientResponse))
             case None =>
               logger.info(s"Error creating new Identity object for application: ${client.applicationName}")
               InternalServerError

@@ -18,6 +18,7 @@ package uk.gov.hmrc.apihubapimstubs.repositories
 
 import com.google.inject.{Inject, Singleton}
 import org.bson.types.ObjectId
+import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.{Filters, Updates}
 import play.api.Logging
 import play.api.libs.json.{Format, JsPath, Reads, Writes}

@@ -30,6 +30,7 @@ class OasDiscoveryApiControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiDeployments())
+          .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
@@ -45,6 +46,7 @@ class OasDiscoveryApiControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiDeployment(id))
+          .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK

@@ -19,13 +19,13 @@ package uk.gov.hmrc.apihubapimstubs.controllers.controllers
 import play.api.libs.json.Json
 import play.api.mvc.MultipartFormData
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apihubapimstubs.controllers.routes
-import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DeploymentFrom, DeploymentsResponse, DetailsResponse, EgressGateway, EgressMapping, FailuresResponse, UpdateMetadata}
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
 
-class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
+class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
-  import SimpleAPiDeploymentControllerSpec._
+  import SimpleApiDeploymentControllerSpec.*
 
   "validate" - {
     "must return 200 Ok when the OAS document is valid" in {
@@ -33,7 +33,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas())
-          .withHeaders("Content-Type" -> "application/yaml")
+          .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
           .withBody(oas)
         val result = route(fixture.application, request).value
 
@@ -46,7 +46,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas())
-          .withHeaders("Content-Type" -> "application/yaml")
+          .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
           .withBody("rhubarb")
         val result = route(fixture.application, request).value
 
@@ -71,6 +71,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -103,6 +104,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -126,6 +128,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -159,6 +162,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -191,6 +195,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -216,6 +221,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+          .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
@@ -245,6 +251,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom())
+          .withHeaders(authorizationHeader)
           .withJsonBody(Json.toJson(deploymentFrom))
         val result = route(fixture.application, request).value
 
@@ -258,6 +265,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom())
+          .withHeaders(authorizationHeader)
           .withJsonBody(Json.obj())
         val result = route(fixture.application, request).value
 
@@ -272,6 +280,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails("test-service-id"))
+          .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
@@ -286,6 +295,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.getEgressGateways())
+          .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
@@ -296,7 +306,7 @@ class SimpleAPiDeploymentControllerSpec extends ControllerSpecBase {
 
 }
 
-object SimpleAPiDeploymentControllerSpec {
+object SimpleApiDeploymentControllerSpec {
 
   val oas: String =
     """
