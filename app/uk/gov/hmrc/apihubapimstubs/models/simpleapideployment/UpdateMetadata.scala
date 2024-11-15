@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+case class UpdateMetadata(
+  description: String,
+  status: String,
+  domain: Option[String] = None,
+  subdomain: Option[String] = None,
+  backends: Seq[String] = Seq.empty,
+  egressMappings: Option[Seq[EgressMapping]] = None,
+  prefixesToRemove: Option[Seq[String]] = None
+)
 
-  val appName: String = config.get[String]("appName")
+object UpdateMetadata {
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+  implicit val formatUpdateMetadata: Format[UpdateMetadata] = Json.format[UpdateMetadata]
 
 }
