@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+import java.time.Instant
 
-  val appName: String = config.get[String]("appName")
+case class ApiDeployment(id: String, deploymentTimestamp: Instant)
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+object ApiDeployment {
+
+  implicit val formatApiDeployment: Format[ApiDeployment] = Json.format[ApiDeployment]
+
+  val cannedResponse: Seq[ApiDeployment] = Seq(
+    ApiDeployment("ems-address-weighting-service", Instant.now()),
+    ApiDeployment("fake-service-id-1", Instant.now().minusSeconds(1)),
+    ApiDeployment("fake-service-id-2", Instant.now().minusSeconds(2))
+  )
 
 }

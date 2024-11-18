@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.idms
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+case class ClientResponse(clientId: String, secret: String)
 
-  val appName: String = config.get[String]("appName")
+object ClientResponse {
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+  implicit val formatClientResponse: Format[ClientResponse] = Json.format[ClientResponse]
 
 }

@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+case class DeploymentsResponse(
+  id: String,
+  version: String,
+  mergeRequestIid: Int,
+  uri: String
+)
 
-  val appName: String = config.get[String]("appName")
+object DeploymentsResponse {
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+  def apply(serviceId: String): DeploymentsResponse = DeploymentsResponse(
+    id = serviceId,
+    version = "0.1.0",
+    mergeRequestIid = 123,
+    uri = s"/internal/v1/simple-api-deployment/deployments/$serviceId/status?mr-iid=123&version=0.1.0"
+  )
+
+  implicit val formatDeploymentsResponse: Format[DeploymentsResponse] = Json.format[DeploymentsResponse]
 
 }

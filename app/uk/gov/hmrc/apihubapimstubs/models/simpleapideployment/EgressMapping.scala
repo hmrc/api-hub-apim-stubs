@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+case class EgressMapping(
+    prefix: String,
+    egressPrefix: String
+)
 
-  val appName: String = config.get[String]("appName")
+object EgressMapping {
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+  implicit val formatEgressMapping: Format[EgressMapping] = Json.format[EgressMapping]
 
 }

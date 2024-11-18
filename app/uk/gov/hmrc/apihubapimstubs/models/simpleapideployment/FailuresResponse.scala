@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.config
+package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration) {
+case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]])
 
-  val appName: String = config.get[String]("appName")
+object FailuresResponse {
 
-  val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
-  val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+  val cannedResponse: FailuresResponse = FailuresResponse(
+    code = "BAD_REQUEST",
+    reason = "Validation Failed.",
+    errors = Some(Seq(
+      Error(
+        `type` = "JSON",
+        message = "malformed or unreadable swagger supplied"
+      )
+    ))
+  )
+
+  implicit val formatFailure: Format[FailuresResponse] = Json.format[FailuresResponse]
 
 }
