@@ -27,7 +27,8 @@ case class DetailsResponse(
   backends: Seq[String],
   egressMappings: Seq[EgressMapping],
   prefixesToRemove: Seq[String],
-  deploymentVersion: String
+  deploymentVersion: String,
+  egress: String,
 )
 
 object DetailsResponse {
@@ -41,7 +42,8 @@ object DetailsResponse {
     backends = Seq("NPS"),
     egressMappings = Seq(EgressMapping("/mapping-from", "/mapping-to")),
     prefixesToRemove = Seq("/v1"),
-    deploymentVersion = "0.1.0"
+    deploymentVersion = "0.1.0",
+    egress = "egress",
   )
 
   implicit val formatDetailsResponse: Format[DetailsResponse] = Json.format[DetailsResponse]
