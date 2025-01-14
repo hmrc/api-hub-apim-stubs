@@ -43,7 +43,7 @@ object DetailsResponse {
     egressMappings = Seq(EgressMapping("/mapping-from", "/mapping-to")),
     prefixesToRemove = Seq("/v1"),
     deploymentVersion = "0.1.0",
-    egress = "egress",
+    egress = "bpr",
   )
 
   implicit val formatDetailsResponse: Format[DetailsResponse] = Json.format[DetailsResponse]
