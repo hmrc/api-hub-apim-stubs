@@ -41,4 +41,8 @@ class OasDiscoveryApiController @Inject()(
     Ok(Json.toJson(ApiDeploymentDetail(id, clock)))
   }
 
+  def getOpenApiDeploymentOAS(id: String): Action[AnyContent] = authenticator {
+    Ok(ApiDeployment.oas)
+  }
+
 }

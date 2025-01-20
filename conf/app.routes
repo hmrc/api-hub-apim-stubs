@@ -12,6 +12,7 @@ GET         /identity/clients/:id/client-scopes                     uk.gov.hmrc.
 # OAS Discovery API routes
 GET         /v1/oas-deployments                                     uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployments()
 GET         /v1/oas-deployments/:id                                 uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployment(id: String)
+GET         /v1/oas-deployments/:id/oas                             uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeploymentOAS(id: String)
 
 # Simple API Deployment routes
 POST        /v1/simple-api-deployment/validate                      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.validateOas()
