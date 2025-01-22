@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.services
+package uk.gov.hmrc.apihubapimstubs.services
 
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -26,7 +26,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.apihubapimstubs.models.idms.{ClientResponse, ClientSecretResponse, Identity}
 import uk.gov.hmrc.apihubapimstubs.repositories.IdentityRepository
-import uk.gov.hmrc.apihubapimstubs.services.IdmsService
 
 import scala.concurrent.Future
 

@@ -23,7 +23,6 @@ import org.mongodb.scala.model.{Filters, Updates}
 import play.api.Logging
 import play.api.libs.json.{Format, JsPath, Reads, Writes}
 import uk.gov.hmrc.apihubapimstubs.models.idms.Identity
-import uk.gov.hmrc.apihubapimstubs.repositories.IdentityRepository.mongoIdentityFormat
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
@@ -36,11 +35,11 @@ class IdentityRepository @Inject()
   extends PlayMongoRepository[Identity](
     collectionName = "identities",
     mongoComponent = mongoComponent,
-    domainFormat = mongoIdentityFormat,
+    domainFormat = IdentityRepository.mongoIdentityFormat,
     indexes = Seq()
   ) {
 
-  import IdentityRepository._
+  import IdentityRepository.*
 
   def insert(identity: Identity): Future[Identity] = {
     collection
@@ -154,7 +153,6 @@ object IdentityRepository extends Logging {
     JsPath.json.update((JsPath \ "clientId").json
       .copyFrom((JsPath \ "_id" \ "$oid").json.pick))
       .andThen(Identity.formatIdentity)
-
 
   val mongoIdentityFormat: Format[Identity] = Format(mongoIdentityReads, mongoIdentityWrites)
 

@@ -17,23 +17,20 @@
 package uk.gov.hmrc.apihubapimstubs.controllers
 
 import com.google.inject.{Inject, Singleton}
-import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.ParseOptions
 import play.api.Logging
 import play.api.libs.Files
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, MultipartFormData}
 import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
+import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton
 class SimpleApiDeploymentController @Inject()(
   cc: ControllerComponents,
   authenticator: Authenticator
-) extends BackendController(cc) with Logging {
-
-  import SimpleApiDeploymentController._
+) extends BackendController(cc) with Logging with OpenApiStuff {
 
   def validateOas(): Action[String] = authenticator(parse.tolerantText) {
     request =>
@@ -100,17 +97,6 @@ class SimpleApiDeploymentController @Inject()(
 
   def getEgressGateways(): Action[AnyContent] = authenticator {
     Ok(Json.toJson(EgressGateway.cannedResponse))
-  }
-
-}
-
-object SimpleApiDeploymentController {
-
-  private def isValidOas(oas: String): Boolean = {
-    val options: ParseOptions = new ParseOptions()
-    options.setResolve(false)
-
-    Option(new OpenAPIV3Parser().readContents(oas, null, options).getOpenAPI).isDefined
   }
 
 }
