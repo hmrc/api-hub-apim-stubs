@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.repositories
+package uk.gov.hmrc.apihubapimstubs.repositories
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AsyncFreeSpec
