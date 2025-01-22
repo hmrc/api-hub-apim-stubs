@@ -32,7 +32,11 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
 
   import OasTransformer.*
 
-  def transformToConsumer(targetOas: String, metadata: DeploymentMetadata): OpenAPI = {
+  def transformToConsumerOas(targetOas: String, metadata: DeploymentMetadata): String = {
+    serialiseOpenApi(transformToConsumerOpenApi(targetOas, metadata))
+  }
+
+  def transformToConsumerOpenApi(targetOas: String, metadata: DeploymentMetadata): OpenAPI = {
     val openApi = parseOpenApi(targetOas)
 
     setInfo(openApi, metadata)

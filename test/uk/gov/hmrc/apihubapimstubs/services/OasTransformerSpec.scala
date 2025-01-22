@@ -35,12 +35,21 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
   import OasTransformerSpec.*
 
-  "transformToConsumer" - {
+  "transformToConsumerOas" - {
+    "must return the correct OAS document" in {
+      val fixture = buildFixture()
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
+      val expected = serialiseOpenApi(openApi)
+      val actual = fixture.oasTransformer.transformToConsumerOas(baseOas, metadata)
+
+      actual mustBe expected
+    }
+  }
+
+  "transformToConsumerOpenApi" - {
     "must add missing sections to an otherwise empty OAS document" in {
       val fixture = buildFixture()
-      val openApi = fixture.oasTransformer.transformToConsumer(baseOas, metadata)
-
-      println(serialiseOpenApi(openApi))
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
 
       openApi.getInfo must not be null
       openApi.getComponents must not be null
@@ -50,7 +59,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
     "must add the x-integration-catalogue section" in {
       val fixture = buildFixture()
-      val openApi = fixture.oasTransformer.transformToConsumer(baseOas, metadata)
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
       val expected = IntegrationCatalogueSection(metadata, clock)
 
       val actual = openApi.getInfo.getExtensions.get(OasTransformer.X_INTEGRATION_CATALOGUE)
@@ -68,7 +77,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
           .asJava
       )
 
-      val openApi = fixture.oasTransformer.transformToConsumer(
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithServers),
         metadata
       )
@@ -82,7 +91,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
       val openApiWithSecurity = parseOpenApi(baseOas)
       openApiWithSecurity.setSecurity(Seq(new SecurityRequirement()).asJava)
 
-      val openApi = fixture.oasTransformer.transformToConsumer(
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithSecurity),
         metadata
       )
@@ -95,7 +104,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApiWithPaths = buildOpenApiWithPaths()
 
-      val openApi = fixture.oasTransformer.transformToConsumer(
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithPaths),
         metadata
       )
@@ -119,7 +128,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApiWithPaths = buildOpenApiWithPaths()
 
-      val openApi = fixture.oasTransformer.transformToConsumer(
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithPaths),
         metadata
       )
