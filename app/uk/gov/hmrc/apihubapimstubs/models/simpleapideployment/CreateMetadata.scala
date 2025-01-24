@@ -23,14 +23,14 @@ case class CreateMetadata(
   name: String,
   description: String,
   egress: String,
-  passthrough: Option[Boolean] = None,
-  status: Option[String] = None,
-  apiType: Option[String] = None,
-  domain: Option[String] = None,
-  subdomain: Option[String] = None,
-  backends: Seq[String] = Seq.empty,
-  egressMappings: Option[Seq[EgressMapping]] = None,
-  prefixesToRemove: Option[Seq[String]] = None
+  passthrough: Boolean,
+  status: String,
+  apiType: String,
+  domain: String,
+  subdomain: String,
+  backends: Seq[String],
+  egressMappings: Seq[EgressMapping],
+  prefixesToRemove: Seq[String]
 )
 
 object CreateMetadata {

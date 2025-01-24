@@ -18,7 +18,7 @@ package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
 import play.api.libs.json.{Format, Json}
 
-case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]])
+case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]] = None)
 
 object FailuresResponse {
 
@@ -31,6 +31,11 @@ object FailuresResponse {
         message = "malformed or unreadable swagger supplied"
       )
     ))
+  )
+
+  val invalidOas: FailuresResponse = FailuresResponse(
+    code = "BAD_REQUEST",
+    reason = "Validation Failed."
   )
 
   implicit val formatFailure: Format[FailuresResponse] = Json.format[FailuresResponse]

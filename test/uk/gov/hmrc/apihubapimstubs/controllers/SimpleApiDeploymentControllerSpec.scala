@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.controllers
+package uk.gov.hmrc.apihubapimstubs.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.MultipartFormData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.apihubapimstubs.controllers.routes
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
 
 class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
@@ -60,22 +59,13 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     "must return 200 Ok and a DeploymentsResponse when the request is valid" in {
       val fixture = buildFixture()
 
-      val metadata = CreateMetadata(
-        lineOfBusiness = "test-lob",
-        name = "test-name",
-        description = "test-description",
-        egress = "test-egress",
-        prefixesToRemove = Some(Seq("test-prefix-1")),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
-      )
-
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
-                "metadata" -> Seq(Json.toJson(metadata).toString()),
+                "metadata" -> Seq(Json.toJson(createMetadata).toString()),
                 "openapi" -> Seq(oas)
               ),
               files = Seq.empty,
@@ -86,21 +76,12 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(DeploymentsResponse(metadata.name))
+        contentAsJson(result) mustBe Json.toJson(DeploymentsResponse(createMetadata.name))
       }
     }
 
     "must return 400 BadRequest and a ValidationFailuresResponse when the OAS document is invalid" in {
       val fixture = buildFixture()
-
-      val metadata = CreateMetadata(
-        lineOfBusiness = "test-lob",
-        name = "test-name",
-        description = "test-description",
-        egress = "test-egress",
-        prefixesToRemove = Some(Seq("test-prefix-1")),
-        egressMappings = None
-      )
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
@@ -108,7 +89,7 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
-                "metadata" -> Seq(Json.toJson(metadata).toString()),
+                "metadata" -> Seq(Json.toJson(createMetadata).toString()),
                 "openapi" -> Seq("rhubarb")
               ),
               files = Seq.empty,
@@ -153,20 +134,13 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
       val serviceId = "test-service-id"
 
-      val metadata = UpdateMetadata(
-        description = "test-description",
-        status = "test-status",
-        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2")),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
-      )
-
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
-                "metadata" -> Seq(Json.toJson(metadata).toString()),
+                "metadata" -> Seq(Json.toJson(updateMetadata).toString()),
                 "openapi" -> Seq(oas)
               ),
               files = Seq.empty,
@@ -186,20 +160,13 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
       val serviceId = "test-service-id"
 
-      val metadata = UpdateMetadata(
-        description = "test-description",
-        status = "test-status",
-        prefixesToRemove = Some(Seq("test-prefix-1", "test-prefix-2")),
-        egressMappings = Some(Seq(EgressMapping("prefix", "egress-prefix")))
-      )
-
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
-                "metadata" -> Seq(Json.toJson(metadata).toString()),
+                "metadata" -> Seq(Json.toJson(updateMetadata).toString()),
                 "openapi" -> Seq("rhubarb")
               ),
               files = Seq.empty,
@@ -246,7 +213,8 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
       val deploymentFrom = DeploymentFrom(
         env = "test-env",
-        serviceId = "test-service-id"
+        serviceId = "test-service-id",
+        egress = "test-egress"
       )
 
       running(fixture.application) {
@@ -306,7 +274,33 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
 }
 
-object SimpleApiDeploymentControllerSpec {
+private object SimpleApiDeploymentControllerSpec {
+
+  val createMetadata: CreateMetadata = CreateMetadata(
+    lineOfBusiness = "test-line-of-business",
+    name = "test-name",
+    description = "test-description",
+    egress = "test-egress",
+    passthrough = false,
+    status = "test-status",
+    apiType = "test-api-type",
+    domain = "test-domain",
+    subdomain = "test-sub-domain",
+    backends = Seq("test-backend-1", "test-backend-2"),
+    egressMappings = Seq(EgressMapping("/from", "/to")),
+    prefixesToRemove = Seq("/remove-me")
+  )
+
+  val updateMetadata: UpdateMetadata = UpdateMetadata(
+    description = "test-description",
+    status = "test-status",
+    egress = "test-egress",
+    domain = "test-domain",
+    subdomain = "test-sub-domain",
+    backends = Seq("test-backend-1", "test-backend-2"),
+    egressMappings = Seq(EgressMapping("/from", "/to")),
+    prefixesToRemove = Seq("/remove-me")
+  )
 
   val oas: String =
     """

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.controllers.auth
+package uk.gov.hmrc.apihubapimstubs.controllers.auth
 
 import org.apache.pekko.stream.testkit.NoMaterializer
 import org.scalatest.freespec.AsyncFreeSpec
@@ -23,14 +23,13 @@ import play.api.Configuration
 import play.api.mvc.{BodyParsers, Request, Result, Results}
 import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
 import uk.gov.hmrc.apihubapimstubs.config.AppConfig
-import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
 
 import java.util.Base64
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatorSpec extends AsyncFreeSpec with Matchers {
 
-  import AuthenticatorSpec._
+  import AuthenticatorSpec.*
 
   "Authenticator.filter" - {
     "must pass authentication when valid credentials are presented" in {

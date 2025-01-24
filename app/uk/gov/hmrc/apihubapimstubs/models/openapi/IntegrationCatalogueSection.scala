@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apihubapimstubs.models.openapi
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import uk.gov.hmrc.apihubapimstubs.models.deployment.DeploymentMetadata
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
 
 import java.time.{Clock, LocalDateTime}
 
@@ -36,7 +36,7 @@ object IntegrationCatalogueSection {
 
   val hipPlatform = "HIP"
 
-  def apply(metadata: DeploymentMetadata, clock: Clock): IntegrationCatalogueSection = {
+  def apply(metadata: CreateMetadata, clock: Clock): IntegrationCatalogueSection = {
     IntegrationCatalogueSection(
       status = metadata.status,
       apiType = metadata.apiType,

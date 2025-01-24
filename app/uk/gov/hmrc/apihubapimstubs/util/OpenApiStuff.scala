@@ -40,4 +40,10 @@ trait OpenApiStuff {
     Option(parseOpenApi(oas)).isDefined
   }
 
+  def oasVersion(oas: String): Option[String] = {
+    Option(parseOpenApi(oas))
+      .flatMap(openApi => Option(openApi.getInfo))
+      .flatMap(info => Option(info.getVersion))
+  }
+
 }

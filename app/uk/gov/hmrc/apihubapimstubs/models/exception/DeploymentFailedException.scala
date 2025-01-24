@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.models.deployment
+package uk.gov.hmrc.apihubapimstubs.models.exception
 
-import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.EgressMapping
+import play.api.libs.json.Json
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.FailuresResponse
 
-case class DeploymentMetadata(
-  lineOfBusiness: String,
-  name: String,
-  description: String,
-  egress: String,
-  passthrough: Boolean,
-  status: String,
-  apiType: String,
-  domain: String,
-  subdomain: String,
-  backends: Seq[String],
-  egressMappings: Seq[EgressMapping],
-  prefixesToRemove: Seq[String]
-)
+case class DeploymentFailedException(message: String, failuresResponse: FailuresResponse) extends ApimStubException(message, null)
+
+object DeploymentFailedException {
+
+  def forFailuresResponse(failuresResponse: FailuresResponse): DeploymentFailedException = {
+    DeploymentFailedException(
+      s"Failed deployment: ${Json.prettyPrint(Json.toJson(failuresResponse))}",
+      failuresResponse
+    )
+  }
+
+}

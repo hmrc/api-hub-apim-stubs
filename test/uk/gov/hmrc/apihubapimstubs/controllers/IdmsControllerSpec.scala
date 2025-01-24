@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.controllers
+package uk.gov.hmrc.apihubapimstubs.controllers
 
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -23,9 +23,8 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.apihubapimstubs.controllers.routes
-import uk.gov.hmrc.apihubapimstubs.models.idms._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.apihubapimstubs.models.idms.*
 
 import scala.concurrent.Future
 

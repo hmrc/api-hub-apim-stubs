@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
+package uk.gov.hmrc.apihubapimstubs.models.exception
 
-import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 
-case class DeploymentFrom(env: String, serviceId: String, egress: String)
+case class DeploymentExistsException(message: String) extends ApimStubException(message, null)
 
-object DeploymentFrom {
+object DeploymentExistsException {
 
-  implicit val formatDeploymentFrom: Format[DeploymentFrom] = Json.format[DeploymentFrom]
+  def forDeployment(deployment: Deployment): DeploymentExistsException = {
+    DeploymentExistsException(s"There is already a deployment for ${deployment.name} in environment ${deployment.environment}")
+  }
 
 }
