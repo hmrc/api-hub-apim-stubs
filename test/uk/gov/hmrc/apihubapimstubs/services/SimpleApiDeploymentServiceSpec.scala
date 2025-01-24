@@ -65,7 +65,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
 
       fixture.simpleApiDeploymentService.deployNewApi(environment, createMetadata, oas).map {
         result =>
-          verify(fixture.autoPublishConnector).publish(eqTo(deploymentWithId))(any)
+          verify(fixture.autoPublishConnector).publish(eqTo(deploymentWithId.name))(any)
           result mustBe Right(DeploymentsResponse(createMetadata.name))
       }
     }
@@ -142,7 +142,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
       fixture.simpleApiDeploymentService.deployExistingApiWithNewConfiguration(environment, serviceId, updateMetadata, oas).map {
         result =>
           verify(fixture.deploymentsRepository).update(eqTo(updatedDeployment))
-          verify(fixture.autoPublishConnector).publish(eqTo(updatedDeployment))(any)
+          verify(fixture.autoPublishConnector).publish(eqTo(updatedDeployment.name))(any)
           result mustBe Right(DeploymentsResponse(serviceId))
       }
     }

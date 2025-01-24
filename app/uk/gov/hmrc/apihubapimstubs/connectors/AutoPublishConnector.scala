@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apihubapimstubs.connectors
 
 import com.google.inject.{Inject, Singleton}
-import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 import uk.gov.hmrc.apihubapimstubs.models.exception.ApimStubException
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -32,8 +31,8 @@ class AutoPublishConnector @Inject()(
   httpClient: HttpClientV2
 )(implicit ec: ExecutionContext) {
 
-  def publish(deployment: Deployment)(implicit hc: HeaderCarrier): Future[Either[ApimStubException, Unit]] = {
-    val url = url"$baseUrl/apis/${deployment.name}/publish"
+  def publish(serviceId: String)(implicit hc: HeaderCarrier): Future[Either[ApimStubException, Unit]] = {
+    val url = url"$baseUrl/integration-catalogue-autopublish/apis/$serviceId/publish"
 
     httpClient.put(url)
       .execute[Unit]

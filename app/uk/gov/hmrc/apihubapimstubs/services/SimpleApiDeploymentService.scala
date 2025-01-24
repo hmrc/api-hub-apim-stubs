@@ -57,7 +57,7 @@ class SimpleApiDeploymentService @Inject()(
       consumerOas = oasTransformer.transformToConsumerOas(oas, createMetadata)
       deployment = Deployment.create(environment, createMetadata, consumerOas, clock)
       deployment <- EitherT(insertDeployment(deployment))
-      _ <- EitherT(autoPublishConnector.publish(deployment))
+      _ <- EitherT(autoPublishConnector.publish(deployment.name))
     } yield DeploymentsResponse(deployment.name)).value
   }
 
@@ -79,7 +79,7 @@ class SimpleApiDeploymentService @Inject()(
       consumerOas = oasTransformer.transformToConsumerOas(oas, createMetadata)
       updated = deployment.update(updateMetadata, consumerOas, clock)
       _ <- EitherT(deploymentsRepository.update(updated))
-      _ <- EitherT(autoPublishConnector.publish(updated))
+      _ <- EitherT(autoPublishConnector.publish(updated.name))
     } yield DeploymentsResponse(serviceId)).value
   }
 
