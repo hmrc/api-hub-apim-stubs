@@ -17,16 +17,36 @@
 package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 
 case class UpdateMetadata(
   description: String,
   status: String,
-  domain: Option[String] = None,
-  subdomain: Option[String] = None,
-  backends: Seq[String] = Seq.empty,
-  egressMappings: Option[Seq[EgressMapping]] = None,
-  prefixesToRemove: Option[Seq[String]] = None
-)
+  egress: String,
+  domain: String,
+  subdomain: String,
+  backends: Seq[String],
+  egressMappings: Seq[EgressMapping],
+  prefixesToRemove: Seq[String]
+) {
+
+  def toCreateMetadata(deployment: Deployment): CreateMetadata = {
+    CreateMetadata(
+      lineOfBusiness = deployment.lineOfBusiness,
+      name = deployment.name,
+      description = description,
+      egress = egress,
+      passthrough = deployment.passthrough,
+      status = status,
+      domain = domain,
+      subdomain = subdomain,
+      backends = backends,
+      egressMappings = egressMappings,
+      prefixesToRemove = prefixesToRemove
+    )
+  }
+
+}
 
 object UpdateMetadata {
 

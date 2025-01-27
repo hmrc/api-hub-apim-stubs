@@ -20,8 +20,8 @@ import com.google.inject.{Inject, Singleton}
 import io.swagger.v3.oas.models.*
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.*
-import uk.gov.hmrc.apihubapimstubs.models.deployment.DeploymentMetadata
 import uk.gov.hmrc.apihubapimstubs.models.openapi.IntegrationCatalogueSection
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
 
 import java.time.Clock
@@ -32,26 +32,26 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
 
   import OasTransformer.*
 
-  def transformToConsumerOas(targetOas: String, metadata: DeploymentMetadata): String = {
-    serialiseOpenApi(transformToConsumerOpenApi(targetOas, metadata))
+  def transformToConsumerOas(targetOas: String, createMetadata: CreateMetadata): String = {
+    serialiseOpenApi(transformToConsumerOpenApi(targetOas, createMetadata))
   }
 
-  def transformToConsumerOpenApi(targetOas: String, metadata: DeploymentMetadata): OpenAPI = {
+  def transformToConsumerOpenApi(targetOas: String, createMetadata: CreateMetadata): OpenAPI = {
     val openApi = parseOpenApi(targetOas)
 
-    setInfo(openApi, metadata)
+    setInfo(openApi, createMetadata)
     setComponents(openApi)
     setPaths(openApi)
     clearServers(openApi)
     setSecurity(openApi)
-    generatePathSecurityAndSecuritySchemes(openApi, metadata)
+    generatePathSecurityAndSecuritySchemes(openApi, createMetadata)
 
     openApi
   }
 
-  private def setInfo(openApi: OpenAPI, metadata: DeploymentMetadata): Unit = {
+  private def setInfo(openApi: OpenAPI, createMetadata: CreateMetadata): Unit = {
     val info = Option(openApi.getInfo).getOrElse(new Info())
-    info.addExtension(X_INTEGRATION_CATALOGUE, IntegrationCatalogueSection(metadata, clock))
+    info.addExtension(X_INTEGRATION_CATALOGUE, IntegrationCatalogueSection(createMetadata, clock))
     openApi.setInfo(info)
   }
 
@@ -73,7 +73,7 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
 
   private def generatePathSecurityAndSecuritySchemes(
     openApi: OpenAPI,
-    metadata: DeploymentMetadata
+    createMetadata: CreateMetadata
   ): Unit = {
     val scopeDefinitions = openApi.getPaths.asScala.toSeq
       .flatMap {
@@ -81,9 +81,9 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
           item.readOperationsMap().asScala
             .map {
               case (method, operation) =>
-                val scopeName = buildScopeName(method, operation, metadata)
+                val scopeName = buildScopeName(method, operation, createMetadata)
                 operation.security(Seq(buildSecurityRequirement(Seq(scopeName))).asJava)
-                ScopeDefinition(scopeName, buildScopeDescription(operation, metadata))
+                ScopeDefinition(scopeName, buildScopeDescription(operation, createMetadata))
             }
       }
 
@@ -97,25 +97,25 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
   private def buildScopeName(
     method: PathItem.HttpMethod,
     operation: Operation,
-    metadata: DeploymentMetadata
+    createMetadata: CreateMetadata
   ): String = {
     String.format(
       "%s:%s-%s-%s",
       method.name.toLowerCase,
-      metadata.lineOfBusiness.toLowerCase,
-      metadata.name,
+      createMetadata.lineOfBusiness.toLowerCase,
+      createMetadata.name,
       operation.getOperationId
     )
   }
 
   private def buildScopeDescription(
     operation: Operation,
-    metadata: DeploymentMetadata
+    createMetadata: CreateMetadata
   ): String = {
     String.format(
       "Scope for %s %s %s",
-      metadata.lineOfBusiness,
-      metadata.name,
+      createMetadata.lineOfBusiness,
+      createMetadata.name,
       operation.getOperationId
     )
   }

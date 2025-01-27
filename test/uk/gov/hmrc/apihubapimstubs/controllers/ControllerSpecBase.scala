@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.controllers
+package uk.gov.hmrc.apihubapimstubs.controllers
 
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers
 import play.api.test.Helpers.AUTHORIZATION
-import uk.gov.hmrc.apihubapimstubs.services.IdmsService
+import uk.gov.hmrc.apihubapimstubs.services.{IdmsService, SimpleApiDeploymentService}
 
 import java.time.{Clock, Instant, ZoneId}
 
@@ -36,20 +36,23 @@ trait ControllerSpecBase extends AnyFreeSpec with Matchers with MockitoSugar wit
 
   case class Fixture(
     application: Application,
-    idmsService: IdmsService
+    idmsService: IdmsService,
+    simpleApiDeploymentService: SimpleApiDeploymentService
   )
 
   def buildFixture(): Fixture = {
     val idmsService = MockitoSugar.mock[IdmsService]
+    val simpleApiDeploymentService= MockitoSugar.mock[SimpleApiDeploymentService]
 
     val application = new GuiceApplicationBuilder()
       .overrides(
         bind[Clock].toInstance(clock),
-        bind[IdmsService].toInstance(idmsService)
+        bind[IdmsService].toInstance(idmsService),
+        bind[SimpleApiDeploymentService].toInstance(simpleApiDeploymentService)
       )
       .build()
 
-    Fixture(application, idmsService)
+    Fixture(application, idmsService, simpleApiDeploymentService)
   }
 
 }

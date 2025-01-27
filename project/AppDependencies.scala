@@ -16,7 +16,8 @@ object AppDependencies {
       ExclusionRule("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310"),
       ExclusionRule("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
     ),
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.14.3"
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.14.3",
+    "org.typelevel" %% "cats-core" % "2.13.0"
   )
 
   val test: Seq[ModuleID] = Seq(

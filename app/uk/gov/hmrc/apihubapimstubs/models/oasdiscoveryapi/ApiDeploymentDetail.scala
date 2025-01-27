@@ -18,11 +18,11 @@ package uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi
 
 import play.api.libs.json.{Format, Json}
 
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, Instant}
 
 case class ApiDeploymentDetail(
   id: String,
-  deploymentTimestamp: LocalDateTime,
+  deploymentTimestamp: Instant,
   deploymentVersion: Option[String],
   oasVersion: Option[String],
   buildVersion: Option[String]
@@ -33,7 +33,7 @@ object ApiDeploymentDetail {
   def apply(id: String, clock: Clock): ApiDeploymentDetail = {
     ApiDeploymentDetail(
       id = id,
-      deploymentTimestamp = LocalDateTime.now(clock),
+      deploymentTimestamp = Instant.now(clock),
       deploymentVersion = Some("0.1.0"),
       oasVersion = Some("0.1.0"),
       buildVersion = Some("0.1.0")

@@ -17,14 +17,14 @@
 package uk.gov.hmrc.apihubapimstubs.models.openapi
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import uk.gov.hmrc.apihubapimstubs.models.deployment.DeploymentMetadata
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
 
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, ZonedDateTime}
 
 case class IntegrationCatalogueSection(
   status: String,
   @JsonProperty("api-type") apiType: String,
-  @JsonProperty("reviewed-date") reviewedDate: LocalDateTime,
+  @JsonProperty("reviewed-date") reviewedDate: ZonedDateTime,
   @JsonProperty("short-description") description: String,
   platform: String,
   backends: Seq[String],
@@ -36,11 +36,11 @@ object IntegrationCatalogueSection {
 
   val hipPlatform = "HIP"
 
-  def apply(metadata: DeploymentMetadata, clock: Clock): IntegrationCatalogueSection = {
+  def apply(metadata: CreateMetadata, clock: Clock): IntegrationCatalogueSection = {
     IntegrationCatalogueSection(
       status = metadata.status,
       apiType = metadata.apiType,
-      reviewedDate = LocalDateTime.now(clock),
+      reviewedDate = ZonedDateTime.now(clock),
       description = metadata.description,
       platform = hipPlatform,
       backends = metadata.backends,

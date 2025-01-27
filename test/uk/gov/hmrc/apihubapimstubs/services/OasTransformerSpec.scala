@@ -23,8 +23,8 @@ import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.{OpenAPI, Operation, PathItem, Paths}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import uk.gov.hmrc.apihubapimstubs.models.deployment.DeploymentMetadata
 import uk.gov.hmrc.apihubapimstubs.models.openapi.IntegrationCatalogueSection
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
 import uk.gov.hmrc.apihubapimstubs.services.OasTransformer.TOKEN_URL_NOT_REQUIRED
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
 
@@ -38,9 +38,9 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
   "transformToConsumerOas" - {
     "must return the correct OAS document" in {
       val fixture = buildFixture()
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, createMetadata)
       val expected = serialiseOpenApi(openApi)
-      val actual = fixture.oasTransformer.transformToConsumerOas(baseOas, metadata)
+      val actual = fixture.oasTransformer.transformToConsumerOas(baseOas, createMetadata)
 
       actual mustBe expected
     }
@@ -49,7 +49,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
   "transformToConsumerOpenApi" - {
     "must add missing sections to an otherwise empty OAS document" in {
       val fixture = buildFixture()
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, createMetadata)
 
       openApi.getInfo must not be null
       openApi.getComponents must not be null
@@ -59,8 +59,8 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
     "must add the x-integration-catalogue section" in {
       val fixture = buildFixture()
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, metadata)
-      val expected = IntegrationCatalogueSection(metadata, clock)
+      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(baseOas, createMetadata)
+      val expected = IntegrationCatalogueSection(createMetadata, clock)
 
       val actual = openApi.getInfo.getExtensions.get(OasTransformer.X_INTEGRATION_CATALOGUE)
 
@@ -79,7 +79,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithServers),
-        metadata
+        createMetadata
       )
 
       openApi.getServers mustBe empty
@@ -93,7 +93,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithSecurity),
-        metadata
+        createMetadata
       )
 
       openApi.getSecurity must be (null)
@@ -106,7 +106,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithPaths),
-        metadata
+        createMetadata
       )
 
       val operation1 = buildOperationWithSecurityRequirement(1, operation1HttpMethod)
@@ -130,7 +130,7 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
 
       val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
         serialiseOpenApi(openApiWithPaths),
-        metadata
+        createMetadata
       )
 
       val operation1 = buildOperationWithSecurityRequirement(1, operation1HttpMethod)
@@ -186,14 +186,13 @@ private object OasTransformerSpec extends OpenApiStuff {
     Fixture(clock, new OasTransformer(clock))
   }
 
-  val metadata: DeploymentMetadata = DeploymentMetadata(
+  val createMetadata: CreateMetadata = CreateMetadata(
     lineOfBusiness = "test-lob",
     name = "test-name",
     description = "test-description",
     egress = "test-egress",
     passthrough = false,
     status = "test-status",
-    apiType = "test-api-type",
     domain = "test-domain",
     subdomain = "test-sub-domain",
     backends = Seq("test-backend-1", "test-backend-2"),
@@ -242,11 +241,11 @@ private object OasTransformerSpec extends OpenApiStuff {
   }
 
   def buildScopeName(httpMethod: HttpMethod, operation: Operation): String = {
-    s"${httpMethod.name.toLowerCase}:${metadata.lineOfBusiness.toLowerCase}-${metadata.name}-${operation.getOperationId}"
+    s"${httpMethod.name.toLowerCase}:${createMetadata.lineOfBusiness.toLowerCase}-${createMetadata.name}-${operation.getOperationId}"
   }
 
   def buildScopeDescription(operation: Operation): String = {
-    s"Scope for ${metadata.lineOfBusiness} ${metadata.name} ${operation.getOperationId}"
+    s"Scope for ${createMetadata.lineOfBusiness} ${createMetadata.name} ${operation.getOperationId}"
   }
 
   def buildOpenApiWithPaths(): OpenAPI = {

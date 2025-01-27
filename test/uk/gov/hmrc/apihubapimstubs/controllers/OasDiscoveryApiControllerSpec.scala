@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apihubapimstubs.controllers.controllers
+package uk.gov.hmrc.apihubapimstubs.controllers
 
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.apihubapimstubs.controllers.routes
+import play.api.test.Helpers.*
 import uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi.{ApiDeployment, ApiDeploymentDetail}
 
 class OasDiscoveryApiControllerSpec extends ControllerSpecBase {

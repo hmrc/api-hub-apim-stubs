@@ -21,3 +21,11 @@ GET         /v1/simple-api-deployment/deployments/:serviceId        uk.gov.hmrc.
 PUT         /v1/simple-api-deployment/deployments/:serviceId        uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId: String)
 PUT         /v1/simple-api-deployment/deployment-from               uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deploymentFrom()
 GET         /v1/simple-api-deployment/egress-gateways               uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.getEgressGateways()
+
+# Simple API Deployment routes - Platform Management API
+POST        /platform-management/environments/:environment/v1/simple-api-deployment/validate                    uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.validateOas(environment: String)
+POST        /platform-management/environments/:environment/v1/simple-api-deployment/deployments                 uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deployNewApi(environment: String)
+GET         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.getDeploymentDetails(environment: String, serviceId: String)
+PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment: String, serviceId: String)
+GET         /platform-management/environments/:environment/v1/simple-api-deployment/egress-gateways             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.getEgressGateways(environment: String)
+PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployment-from             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deploymentFrom(environment: String)

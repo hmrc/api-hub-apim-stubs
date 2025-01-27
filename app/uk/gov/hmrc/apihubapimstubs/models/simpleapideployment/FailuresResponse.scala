@@ -17,8 +17,9 @@
 package uk.gov.hmrc.apihubapimstubs.models.simpleapideployment
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 
-case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]])
+case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Error]] = None)
 
 object FailuresResponse {
 
@@ -32,6 +33,22 @@ object FailuresResponse {
       )
     ))
   )
+
+  val invalidOas: FailuresResponse = FailuresResponse(
+    code = "BAD_REQUEST",
+    reason = "Validation Failed."
+  )
+
+  def deploymentAlreadyExists(name: String, lineOfBusiness: String): FailuresResponse = {
+    FailuresResponse(
+      code = "BAD_REQUEST",
+      reason = s"The API \"$name\" already exists in the Line of Business \"$lineOfBusiness\"."
+    )
+  }
+
+  def deploymentAlreadyExists(deployment: Deployment): FailuresResponse = {
+    deploymentAlreadyExists(deployment.name, deployment.lineOfBusiness)
+  }
 
   implicit val formatFailure: Format[FailuresResponse] = Json.format[FailuresResponse]
 
