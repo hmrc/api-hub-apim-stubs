@@ -23,7 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.apihubapimstubs.connectors.AutoPublishConnector
 import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
-import uk.gov.hmrc.apihubapimstubs.models.exception.{ApimStubException, DeploymentFailedException, DeploymentNotFoundException}
+import uk.gov.hmrc.apihubapimstubs.models.exception.{ApimStubException, DeploymentExistsException, DeploymentFailedException, DeploymentNotFoundException}
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
 import uk.gov.hmrc.apihubapimstubs.models.utility.SemVer
 import uk.gov.hmrc.apihubapimstubs.repositories.DeploymentsRepository
@@ -76,6 +76,22 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
       fixture.simpleApiDeploymentService.deployNewApi(environment, createMetadata, invalidOas).map(
         result =>
           result mustBe Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas))
+      )
+    }
+
+    "must return a DeploymentFailedException with failures when the deployment already exists" in {
+      val fixture = buildFixture()
+
+      when(fixture.deploymentsRepository.insert(any))
+        .thenReturn(Future.successful(Left(DeploymentExistsException.forService(environment, serviceId))))
+
+      fixture.simpleApiDeploymentService.deployNewApi(environment, createMetadata, oas).map(
+        result =>
+          result mustBe Left(
+            DeploymentFailedException.forFailuresResponse(
+              FailuresResponse.deploymentAlreadyExists(serviceId, createMetadata.lineOfBusiness)
+            )
+          )
       )
     }
   }

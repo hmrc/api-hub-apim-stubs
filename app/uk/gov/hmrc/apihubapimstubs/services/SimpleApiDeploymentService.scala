@@ -94,10 +94,7 @@ class SimpleApiDeploymentService @Inject()(
         case Left(_: DeploymentExistsException) =>
           Left(
             DeploymentFailedException.forFailuresResponse(
-              FailuresResponse(
-                code = "BAD_REQUEST",
-                reason = s"The API \"${deployment.name}\" already exists in the Line of Business \"${deployment.lineOfBusiness}\"."
-              )
+              FailuresResponse.deploymentAlreadyExists(deployment)
             )
           )
         case Left(e) => Left(e)

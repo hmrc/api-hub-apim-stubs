@@ -22,8 +22,12 @@ case class DeploymentExistsException(message: String) extends ApimStubException(
 
 object DeploymentExistsException {
 
+  def forService(environment: String, name: String): DeploymentExistsException = {
+    DeploymentExistsException(s"There is already a deployment for $name in environment $environment")
+  }
+
   def forDeployment(deployment: Deployment): DeploymentExistsException = {
-    DeploymentExistsException(s"There is already a deployment for ${deployment.name} in environment ${deployment.environment}")
+    DeploymentExistsException.forService(deployment.environment, deployment.name)
   }
 
 }

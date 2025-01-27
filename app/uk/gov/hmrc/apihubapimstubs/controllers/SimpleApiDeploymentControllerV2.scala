@@ -57,10 +57,12 @@ class SimpleApiDeploymentControllerV2 @Inject()(
                 case Left(e) => throw e
               }
             case e: JsError =>
-              logger.warn(s"Error parsing CreateMetadata ${Json.prettyPrint(JsError.toJson(e))}")
+              logger.warn(s"Deploy new API error parsing CreateMetadata ${Json.prettyPrint(JsError.toJson(e))}")
               Future.successful(BadRequest)
           }
-        case _ => Future.successful(BadRequest)
+        case (maybeMetadata, maybeOas) =>
+          logger.warn(s"Deploy new API request incomplete, has metadata: ${maybeMetadata.isDefined} has OAS: ${maybeOas.isDefined}")
+          Future.successful(BadRequest)
       }
   }
 
@@ -77,18 +79,21 @@ class SimpleApiDeploymentControllerV2 @Inject()(
     implicit request =>
       (request.body.dataParts.get("metadata"), request.body.dataParts.get("openapi")) match {
         case (Some(Seq(metadata)), Some(Seq(oas))) =>
-          Json.parse(metadata).validate[UpdateMetadata].fold(
-            _ => Future.successful(BadRequest),
-            validMetadata => {
-              service.deployExistingApiWithNewConfiguration(environment, serviceId, validMetadata, oas).map {
+          Json.parse(metadata).validate[UpdateMetadata] match {
+            case JsSuccess(updateMetadata, _) =>
+              service.deployExistingApiWithNewConfiguration(environment, serviceId, updateMetadata, oas).map {
                 case Right(deploymentsResponse) => Ok(Json.toJson(deploymentsResponse))
                 case Left(e: DeploymentNotFoundException) => NotFound
                 case Left(e: DeploymentFailedException) => BadRequest(Json.toJson(e.failuresResponse))
                 case Left(e) => throw e
               }
-            }
-          )
-        case _ => Future.successful(BadRequest)
+            case e: JsError =>
+              logger.warn(s"Deploy existing API with new configuration error parsing UpdateMetadata ${Json.prettyPrint(JsError.toJson(e))}")
+              Future.successful(BadRequest)
+          }
+        case (maybeMetadata, maybeOas) =>
+          logger.warn(s"Deploy existing API with new configuration request incomplete, has metadata: ${maybeMetadata.isDefined} has OAS: ${maybeOas.isDefined}")
+          Future.successful(BadRequest)
       }
   }
 
