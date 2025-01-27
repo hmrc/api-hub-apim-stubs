@@ -193,7 +193,6 @@ private object OasTransformerSpec extends OpenApiStuff {
     egress = "test-egress",
     passthrough = false,
     status = "test-status",
-    apiType = "test-api-type",
     domain = "test-domain",
     subdomain = "test-sub-domain",
     backends = Seq("test-backend-1", "test-backend-2"),

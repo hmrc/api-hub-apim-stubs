@@ -29,7 +29,7 @@ import uk.gov.hmrc.apihubapimstubs.models.utility.SemVer
 import uk.gov.hmrc.apihubapimstubs.repositories.DeploymentsRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.{Clock, Instant, LocalDateTime, ZoneId}
+import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.Future
 
 class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with MockitoSugar {
@@ -90,7 +90,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
 
       fixture.simpleApiDeploymentService.getDeploymentDetails(environment, serviceId).map(
         result =>
-          result mustBe Right(deployment.toDetailsResponse())
+          result mustBe Right(deployment.toDetailsResponse)
       )
     }
 
@@ -112,7 +112,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
     "must store the updated deployment and return the DeploymentsResponse on success" in {
       val fixture = buildFixture()
       val deployment = buildDeploymentWithId(fixture)
-        .copy(deploymentTimestamp = LocalDateTime.now(fixture.clock).minusDays(1))
+        .copy(deploymentTimestamp = Instant.now(fixture.clock).minusSeconds(1))
 
       val createMetadata = updateMetadata.toCreateMetadata(deployment)
 
@@ -125,7 +125,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
         backends = updateMetadata.backends,
         egressMappings = updateMetadata.egressMappings,
         prefixesToRemove = updateMetadata.prefixesToRemove,
-        deploymentTimestamp = LocalDateTime.now(fixture.clock),
+        deploymentTimestamp = Instant.now(fixture.clock),
         deploymentVersion = SemVer(deployment.deploymentVersion).incrementMinor().version,
         oas = fixture.oasTransformer.transformToConsumerOas(oas, createMetadata)
       )
@@ -219,7 +219,6 @@ private object SimpleApiDeploymentServiceSpec extends MockitoSugar {
     egress = "test-egress",
     passthrough = false,
     status = "test-status",
-    apiType = "test-api-type",
     domain = "test-domain",
     subdomain = "test-sub-domain",
     backends = Seq("test-backend"),
@@ -255,7 +254,7 @@ private object SimpleApiDeploymentServiceSpec extends MockitoSugar {
     backends = createMetadata.backends,
     egressMappings = createMetadata.egressMappings,
     prefixesToRemove = createMetadata.prefixesToRemove,
-    deploymentTimestamp = LocalDateTime.now(fixture.clock),
+    deploymentTimestamp = Instant.now(fixture.clock),
     deploymentVersion = defaultVersion,
     oasVersion = oasVersion,
     buildVersion = defaultVersion,

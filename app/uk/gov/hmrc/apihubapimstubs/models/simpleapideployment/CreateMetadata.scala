@@ -25,13 +25,17 @@ case class CreateMetadata(
   egress: String,
   passthrough: Boolean,
   status: String,
-  apiType: String,
   domain: String,
   subdomain: String,
   backends: Seq[String],
   egressMappings: Seq[EgressMapping],
   prefixesToRemove: Seq[String]
-)
+) {
+
+  // The HUB doesn't pass this to APIM
+  def apiType: String = "SIMPLE"
+
+}
 
 object CreateMetadata {
 

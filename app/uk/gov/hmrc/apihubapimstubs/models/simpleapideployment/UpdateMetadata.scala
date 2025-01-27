@@ -38,7 +38,6 @@ case class UpdateMetadata(
       egress = egress,
       passthrough = deployment.passthrough,
       status = status,
-      apiType = deployment.apiType,
       domain = domain,
       subdomain = subdomain,
       backends = backends,

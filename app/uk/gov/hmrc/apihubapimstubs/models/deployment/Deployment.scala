@@ -21,7 +21,7 @@ import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, D
 import uk.gov.hmrc.apihubapimstubs.models.utility.{MongoIdentifier, SemVer}
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
 
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, Instant}
 
 case class Deployment(
   id: Option[String],
@@ -38,7 +38,7 @@ case class Deployment(
   backends: Seq[String],
   egressMappings: Seq[EgressMapping],
   prefixesToRemove: Seq[String],
-  deploymentTimestamp: LocalDateTime,
+  deploymentTimestamp: Instant,
   deploymentVersion: String,
   oasVersion: String,
   buildVersion: String,
@@ -61,7 +61,7 @@ case class Deployment(
       backends = metadata.backends,
       egressMappings = metadata.egressMappings,
       prefixesToRemove = metadata.prefixesToRemove,
-      deploymentTimestamp = LocalDateTime.now(clock),
+      deploymentTimestamp = Instant.now(clock),
       deploymentVersion = SemVer(deploymentVersion).incrementMinor().version,
       oasVersion = oasVersion(oas).getOrElse("1.0.0"),
       buildVersion = buildVersion,
@@ -69,7 +69,7 @@ case class Deployment(
     )
   }
 
-  def toDetailsResponse(): DetailsResponse = {
+  def toDetailsResponse: DetailsResponse = {
     DetailsResponse(
       description = description,
       status = status,
@@ -104,7 +104,7 @@ object Deployment extends OpenApiStuff {
       backends = metadata.backends,
       egressMappings = metadata.egressMappings,
       prefixesToRemove = metadata.prefixesToRemove,
-      deploymentTimestamp = LocalDateTime.now(clock),
+      deploymentTimestamp = Instant.now(clock),
       deploymentVersion = "0.1.0",
       oasVersion = oasVersion(oas).getOrElse("1.0.0"),
       buildVersion = "0.1.0",

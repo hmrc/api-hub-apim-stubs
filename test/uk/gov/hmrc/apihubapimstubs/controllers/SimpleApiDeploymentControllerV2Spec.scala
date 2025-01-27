@@ -26,7 +26,7 @@ import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 import uk.gov.hmrc.apihubapimstubs.models.exception.{DeploymentFailedException, DeploymentNotFoundException}
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
 
-import java.time.{Clock, LocalDateTime}
+import java.time.{Clock, Instant}
 import scala.concurrent.Future
 
 class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
@@ -153,7 +153,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       val deployment = buildDeployment(clock)
 
       when(fixture.simpleApiDeploymentService.getDeploymentDetails(eqTo(environment), eqTo(serviceId)))
-        .thenReturn(Future.successful(Right(deployment.toDetailsResponse())))
+        .thenReturn(Future.successful(Right(deployment.toDetailsResponse)))
 
       running(fixture.application) {
         val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.getDeploymentDetails(environment, serviceId))
@@ -161,7 +161,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(deployment.toDetailsResponse())
+        contentAsJson(result) mustBe Json.toJson(deployment.toDetailsResponse)
       }
     }
 
@@ -328,7 +328,6 @@ private object SimpleApiDeploymentControllerV2Spec {
     egress = "test-egress",
     passthrough = false,
     status = "test-status",
-    apiType = "test-api-type",
     domain = "test-domain",
     subdomain = "test-sub-domain",
     backends = Seq("test-backend"),
@@ -362,7 +361,7 @@ private object SimpleApiDeploymentControllerV2Spec {
     backends = createMetadata.backends,
     egressMappings = createMetadata.egressMappings,
     prefixesToRemove = createMetadata.prefixesToRemove,
-    deploymentTimestamp = LocalDateTime.now(clock),
+    deploymentTimestamp = Instant.now(clock),
     deploymentVersion = defaultVersion,
     oasVersion = oasVersion,
     buildVersion = defaultVersion,

@@ -63,7 +63,7 @@ class SimpleApiDeploymentService @Inject()(
 
   def getDeploymentDetails(environment: String, serviceId: String): Future[Either[ApimStubException, DetailsResponse]] = {
     deploymentsRepository.findInEnvironment(environment, serviceId)
-      .map(_.map(_.toDetailsResponse()))
+      .map(_.map(_.toDetailsResponse))
   }
 
   def deployExistingApiWithNewConfiguration(

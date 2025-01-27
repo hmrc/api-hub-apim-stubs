@@ -17,8 +17,9 @@
 package uk.gov.hmrc.apihubapimstubs.controllers
 
 import com.google.inject.{Inject, Singleton}
+import play.api.Logging
 import play.api.libs.Files
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, MultipartFormData}
 import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
 import uk.gov.hmrc.apihubapimstubs.models.exception.{ApimStubException, DeploymentFailedException, DeploymentNotFoundException}
@@ -33,7 +34,7 @@ class SimpleApiDeploymentControllerV2 @Inject()(
   cc: ControllerComponents,
   authenticator: Authenticator,
   service: SimpleApiDeploymentService
-)(implicit ec: ExecutionContext) extends BackendController(cc) {
+)(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
 
   def validateOas(environment: String): Action[String] = authenticator(parse.tolerantText) {
     implicit request =>
@@ -48,16 +49,17 @@ class SimpleApiDeploymentControllerV2 @Inject()(
     implicit request =>
       (request.body.dataParts.get("metadata"), request.body.dataParts.get("openapi")) match {
         case (Some(Seq(metadata)), Some(Seq(oas))) =>
-          Json.parse(metadata).validate[CreateMetadata].fold(
-            _ => Future.successful(BadRequest),
-            validMetadata => {
-              service.deployNewApi(environment, validMetadata, oas).map {
+          Json.parse(metadata).validate[CreateMetadata] match {
+            case JsSuccess(createMetadata, _) =>
+              service.deployNewApi(environment, createMetadata, oas).map {
                 case Right(deploymentsResponse) => Ok(Json.toJson(deploymentsResponse))
                 case Left(e: DeploymentFailedException) => BadRequest(Json.toJson(e.failuresResponse))
                 case Left(e) => throw e
               }
-            }
-          )
+            case e: JsError =>
+              logger.warn(s"Error parsing CreateMetadata ${Json.prettyPrint(JsError.toJson(e))}")
+              Future.successful(BadRequest)
+          }
         case _ => Future.successful(BadRequest)
       }
   }
@@ -92,6 +94,11 @@ class SimpleApiDeploymentControllerV2 @Inject()(
 
   def getEgressGateways(environment: String): Action[AnyContent] = authenticator {
     Ok(Json.toJson(service.getEgressGateways(environment)))
+  }
+
+  def deploymentFrom(environment: String): Action[JsValue] = authenticator(parse.json) {
+    implicit request =>
+      NotImplemented
   }
 
 }
