@@ -93,7 +93,8 @@ object AuthenticatorSpec extends StubPlayBodyParsersFactory {
       Map(
         "appName" -> "test",
         "credentials.inbound.clientId" -> testClientId,
-        "credentials.inbound.secret" -> testSecret
+        "credentials.inbound.secret" -> testSecret,
+        "oas.servers" -> Seq.empty
       )
     )
 

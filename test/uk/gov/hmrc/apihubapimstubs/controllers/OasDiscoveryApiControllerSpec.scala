@@ -49,7 +49,7 @@ class OasDiscoveryApiControllerSpec extends ControllerSpecBase {
         val result = route(fixture.application, request).value
 
         status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(ApiDeploymentDetail(id, clock))
+        contentAsJson(result) mustBe Json.toJson(ApiDeploymentDetail.cannedResponse(id, clock))
       }
     }
   }

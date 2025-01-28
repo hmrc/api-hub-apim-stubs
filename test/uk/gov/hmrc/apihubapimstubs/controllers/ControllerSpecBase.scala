@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers
 import play.api.test.Helpers.AUTHORIZATION
-import uk.gov.hmrc.apihubapimstubs.services.{IdmsService, SimpleApiDeploymentService}
+import uk.gov.hmrc.apihubapimstubs.services.{IdmsService, OasDiscoveryService, SimpleApiDeploymentService}
 
 import java.time.{Clock, Instant, ZoneId}
 
@@ -37,22 +37,25 @@ trait ControllerSpecBase extends AnyFreeSpec with Matchers with MockitoSugar wit
   case class Fixture(
     application: Application,
     idmsService: IdmsService,
-    simpleApiDeploymentService: SimpleApiDeploymentService
+    simpleApiDeploymentService: SimpleApiDeploymentService,
+    oasDiscoveryService: OasDiscoveryService
   )
 
   def buildFixture(): Fixture = {
     val idmsService = MockitoSugar.mock[IdmsService]
     val simpleApiDeploymentService= MockitoSugar.mock[SimpleApiDeploymentService]
+    val oasDiscoveryService = MockitoSugar.mock[OasDiscoveryService]
 
     val application = new GuiceApplicationBuilder()
       .overrides(
         bind[Clock].toInstance(clock),
         bind[IdmsService].toInstance(idmsService),
-        bind[SimpleApiDeploymentService].toInstance(simpleApiDeploymentService)
+        bind[SimpleApiDeploymentService].toInstance(simpleApiDeploymentService),
+        bind[OasDiscoveryService].toInstance(oasDiscoveryService)
       )
       .build()
 
-    Fixture(application, idmsService, simpleApiDeploymentService)
+    Fixture(application, idmsService, simpleApiDeploymentService, oasDiscoveryService)
   }
 
 }

@@ -29,3 +29,8 @@ GET         /platform-management/environments/:environment/v1/simple-api-deploym
 PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment: String, serviceId: String)
 GET         /platform-management/environments/:environment/v1/simple-api-deployment/egress-gateways             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.getEgressGateways(environment: String)
 PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployment-from             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deploymentFrom(environment: String)
+
+# OAS Discovery API routes - Platform Management API
+GET         /platform-management/environments/:environment/v1/oas-deployments                                   uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployments(environment: String)
+GET         /platform-management/environments/:environment/v1/oas-deployments/:id                               uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployment(environment: String, id: String)
+GET         /platform-management/environments/:environment/v1/oas-deployments/:id/oas                           uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiSpecification(environment: String, id: String)
