@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apihubapimstubs.models.deployment
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi.{ApiDeployment, ApiDeploymentDetail}
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DetailsResponse, EgressMapping, UpdateMetadata}
 import uk.gov.hmrc.apihubapimstubs.models.utility.{MongoIdentifier, SemVer}
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
@@ -81,6 +82,23 @@ case class Deployment(
       prefixesToRemove = prefixesToRemove,
       deploymentVersion = deploymentVersion,
       egress = egress
+    )
+  }
+
+  def toApiDeployment: ApiDeployment = {
+    ApiDeployment(
+      id = name,
+      deploymentTimestamp = deploymentTimestamp
+    )
+  }
+
+  def toApiDeploymentDetail: ApiDeploymentDetail = {
+    ApiDeploymentDetail(
+      id = name,
+      deploymentTimestamp = deploymentTimestamp,
+      deploymentVersion = Some(deploymentVersion),
+      oasVersion = Some(oasVersion),
+      buildVersion = Some(buildVersion)
     )
   }
 

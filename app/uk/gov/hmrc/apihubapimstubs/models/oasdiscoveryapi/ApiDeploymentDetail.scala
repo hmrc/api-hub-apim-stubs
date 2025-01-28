@@ -30,7 +30,7 @@ case class ApiDeploymentDetail(
 
 object ApiDeploymentDetail {
 
-  def apply(id: String, clock: Clock): ApiDeploymentDetail = {
+  def cannedResponse(id: String, clock: Clock): ApiDeploymentDetail = {
     ApiDeploymentDetail(
       id = id,
       deploymentTimestamp = Instant.now(clock),
