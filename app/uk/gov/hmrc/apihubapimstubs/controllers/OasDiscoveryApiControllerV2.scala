@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apihubapimstubs.controllers
 
 import com.google.inject.{Inject, Singleton}
-import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
@@ -32,7 +31,7 @@ class OasDiscoveryApiControllerV2 @Inject()(
   cc: ControllerComponents,
   authenticator: Authenticator,
   oasDiscoveryService: OasDiscoveryService
-)(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
+)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def getOpenApiDeployments(environment: String): Action[AnyContent] = authenticator.async {
     implicit request =>
