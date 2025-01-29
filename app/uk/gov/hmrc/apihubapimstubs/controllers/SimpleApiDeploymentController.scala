@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SimpleApiDeploymentControllerV2 @Inject()(
+class SimpleApiDeploymentController @Inject()(
   cc: ControllerComponents,
   authenticator: Authenticator,
   service: SimpleApiDeploymentService

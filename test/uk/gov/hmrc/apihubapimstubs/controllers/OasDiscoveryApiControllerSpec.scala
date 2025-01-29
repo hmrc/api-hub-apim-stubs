@@ -26,7 +26,7 @@ import uk.gov.hmrc.apihubapimstubs.models.exception.DeploymentNotFoundException
 
 import scala.concurrent.Future
 
-class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
+class OasDiscoveryApiControllerSpec extends ControllerSpecBase with TestData {
 
   "getOpenApiDeployments" - {
     "must return 200 Ok and a list of ApiDeployment" in {
@@ -38,7 +38,7 @@ class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
         .thenReturn(Future.successful(Seq(deployment1, deployment2)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.OasDiscoveryApiControllerV2.getOpenApiDeployments(environment))
+        val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiDeployments(environment))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -57,7 +57,7 @@ class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
         .thenReturn(Future.successful(Right(deployment)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.OasDiscoveryApiControllerV2.getOpenApiDeployment(environment, deployment.id))
+        val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiDeployment(environment, deployment.id))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -75,7 +75,7 @@ class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
         .thenReturn(Future.successful(Left(exception)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.OasDiscoveryApiControllerV2.getOpenApiDeployment(environment, id))
+        val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiDeployment(environment, id))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -93,7 +93,7 @@ class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
         .thenReturn(Future.successful(Right(baseOas)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.OasDiscoveryApiControllerV2.getOpenApiSpecification(environment, id))
+        val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiSpecification(environment, id))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -111,7 +111,7 @@ class OasDiscoveryApiControllerV2Spec extends ControllerSpecBase with TestData {
         .thenReturn(Future.successful(Left(exception)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.OasDiscoveryApiControllerV2.getOpenApiSpecification(environment, id))
+        val request = FakeRequest(routes.OasDiscoveryApiController.getOpenApiSpecification(environment, id))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 

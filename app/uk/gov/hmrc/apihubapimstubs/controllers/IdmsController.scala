@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IdmsControllerV2 @Inject()(
+class IdmsController @Inject()(
   cc: ControllerComponents,
   identityService: IdmsService,
   authenticator: Authenticator

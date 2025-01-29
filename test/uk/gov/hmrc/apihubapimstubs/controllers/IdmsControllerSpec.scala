@@ -28,9 +28,9 @@ import uk.gov.hmrc.apihubapimstubs.models.idms.*
 
 import scala.concurrent.Future
 
-class IdmsControllerV2Spec extends ControllerSpecBase {
+class IdmsControllerSpec extends ControllerSpecBase {
 
-  import IdmsControllerV2Spec.*
+  import IdmsControllerSpec.*
 
   "retrieve Client secret" - {
     "must return 200 and secret json for a valid request" in {
@@ -40,7 +40,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         val clientId = "CLIENTID123"
         val expected = ClientSecretResponse("client-secret-123456-123456")
 
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientSecret(environment, clientId).url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientSecret(environment, clientId).url)
           .withHeaders(authorizationHeader)
 
         when(fixture.idmsService.getClientSecret(clientId)).thenReturn(Future.successful(Some(expected)))
@@ -55,7 +55,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
       running(fixture.application) {
         val clientId = "CLIENTID123"
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientSecret(environment, clientId).url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientSecret(environment, clientId).url)
           .withHeaders(authorizationHeader)
 
         when(fixture.idmsService.getClientSecret(clientId)).thenReturn(Future.successful(None))
@@ -69,7 +69,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
       running(fixture.application) {
         val clientId = "CLIENTID123"
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientSecret(environment, clientId).url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientSecret(environment, clientId).url)
 
         val result = route(fixture.application, request).value
         status(result) mustBe Status.UNAUTHORIZED
@@ -87,7 +87,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
           description = "test-description"
         )
         val json = Json.toJson(client)
-        val request: Request[JsValue] = FakeRequest(POST, routes.IdmsControllerV2.createClient(environment).url)
+        val request: Request[JsValue] = FakeRequest(POST, routes.IdmsController.createClient(environment).url)
           .withHeaders(
             CONTENT_TYPE -> "application/json",
             authorizationHeader
@@ -111,7 +111,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       running(fixture.application) {
         val request = FakeRequest(
           POST,
-          routes.IdmsControllerV2.createClient(environment).url
+          routes.IdmsController.createClient(environment).url
         )
           .withHeaders(
             CONTENT_TYPE -> "application/json",
@@ -128,7 +128,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(POST, routes.IdmsControllerV2.createClient(environment).url)
+        val request = FakeRequest(POST, routes.IdmsController.createClient(environment).url)
           .withHeaders(
             CONTENT_TYPE -> "application/json"
           ).withBody(Json.parse("{}"))
@@ -150,7 +150,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
         val request = FakeRequest(
           DELETE,
-          routes.IdmsControllerV2.deleteClient(environment, clientId).url
+          routes.IdmsController.deleteClient(environment, clientId).url
         )
           .withHeaders(authorizationHeader)
 
@@ -165,7 +165,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       running(fixture.application) {
         val request = FakeRequest(
           DELETE,
-          routes.IdmsControllerV2.deleteClient(environment, "test-client-id").url
+          routes.IdmsController.deleteClient(environment, "test-client-id").url
         )
 
         val result = route(fixture.application, request).value
@@ -183,7 +183,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
         val request = FakeRequest(
           DELETE,
-          routes.IdmsControllerV2.deleteClient(environment, clientId).url
+          routes.IdmsController.deleteClient(environment, clientId).url
         )
           .withHeaders(authorizationHeader)
 
@@ -206,7 +206,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
         val request = FakeRequest(
           PUT,
-          routes.IdmsControllerV2.addClientScope(environment, id, clientScopeId).url
+          routes.IdmsController.addClientScope(environment, id, clientScopeId).url
         )
           .withHeaders(authorizationHeader)
 
@@ -222,7 +222,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
         val request = FakeRequest(
           PUT,
-          routes.IdmsControllerV2.addClientScope(environment, "test-id", "test-client-scope-id").url
+          routes.IdmsController.addClientScope(environment, "test-id", "test-client-scope-id").url
         )
 
         val result = route(fixture.application, request).value
@@ -242,7 +242,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         when(fixture.idmsService.deleteClientScope(ArgumentMatchers.eq(id), ArgumentMatchers.eq(clientScopeId)))
           .thenReturn(Future.successful(Some(())))
 
-        val request = FakeRequest(routes.IdmsControllerV2.deleteClientScope(environment, id, clientScopeId))
+        val request = FakeRequest(routes.IdmsController.deleteClientScope(environment, id, clientScopeId))
           .withHeaders(authorizationHeader)
 
         val result = route(fixture.application, request).value
@@ -260,7 +260,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         when(fixture.idmsService.deleteClientScope(ArgumentMatchers.eq(id), ArgumentMatchers.eq(clientScopeId)))
           .thenReturn(Future.successful(None))
 
-        val request = FakeRequest(routes.IdmsControllerV2.deleteClientScope(environment, id, clientScopeId))
+        val request = FakeRequest(routes.IdmsController.deleteClientScope(environment, id, clientScopeId))
           .withHeaders(authorizationHeader)
 
         val result = route(fixture.application, request).value
@@ -274,7 +274,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       running(fixture.application) {
         val request = FakeRequest(
           DELETE,
-          routes.IdmsControllerV2.addClientScope(environment, "test-client-id", "test-client-scope-id").url
+          routes.IdmsController.addClientScope(environment, "test-client-id", "test-client-scope-id").url
         )
 
         val result = route(fixture.application, request).value
@@ -291,7 +291,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         val clientId = "CLIENTID123"
         val expected = ClientSecretResponse("client-secret-123456-123456")
 
-        val request = FakeRequest(POST, routes.IdmsControllerV2.generateNewClientSecret(environment, clientId).url)
+        val request = FakeRequest(POST, routes.IdmsController.generateNewClientSecret(environment, clientId).url)
           .withHeaders(authorizationHeader)
 
         when(fixture.idmsService.generateNewClientSecret(clientId)).thenReturn(Future.successful(Some(expected)))
@@ -307,7 +307,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       running(fixture.application) {
         val clientId = "CLIENTID123"
 
-        val request = FakeRequest(POST, routes.IdmsControllerV2.generateNewClientSecret(environment, clientId).url)
+        val request = FakeRequest(POST, routes.IdmsController.generateNewClientSecret(environment, clientId).url)
 
         val result = route(fixture.application, request).value
         status(result) mustBe Status.UNAUTHORIZED
@@ -326,7 +326,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         when(fixture.idmsService.getClient(ArgumentMatchers.eq(id)))
           .thenReturn(Future.successful(Some(identity)))
 
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientScopes(environment, id).url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientScopes(environment, id).url)
           .withHeaders(authorizationHeader)
 
         val result = route(fixture.application, request).value
@@ -347,7 +347,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
         when(fixture.idmsService.getClient(ArgumentMatchers.eq(id)))
           .thenReturn(Future.successful(None))
 
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientScopes(environment, id).url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientScopes(environment, id).url)
           .withHeaders(authorizationHeader)
 
         val result = route(fixture.application, request).value
@@ -360,7 +360,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(GET, routes.IdmsControllerV2.getClientScopes(environment, "test-id").url)
+        val request = FakeRequest(GET, routes.IdmsController.getClientScopes(environment, "test-id").url)
 
         val result = route(fixture.application, request).value
 
@@ -371,7 +371,7 @@ class IdmsControllerV2Spec extends ControllerSpecBase {
 
 }
 
-private object IdmsControllerV2Spec {
+private object IdmsControllerSpec {
 
   val environment: String = "test-environment"
 

@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class OasDiscoveryApiControllerV2 @Inject()(
+class OasDiscoveryApiController @Inject()(
   cc: ControllerComponents,
   authenticator: Authenticator,
   oasDiscoveryService: OasDiscoveryService

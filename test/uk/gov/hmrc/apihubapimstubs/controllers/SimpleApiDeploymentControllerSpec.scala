@@ -29,9 +29,9 @@ import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
 import java.time.{Clock, Instant}
 import scala.concurrent.Future
 
-class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
+class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
-  import SimpleApiDeploymentControllerV2Spec.*
+  import SimpleApiDeploymentControllerSpec.*
 
   "validate" - {
     "must return 200 Ok when the OAS document is valid" in {
@@ -41,7 +41,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Right(()))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.validateOas(environment))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas(environment))
           .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
           .withBody(oas)
         val result = route(fixture.application, request).value
@@ -57,7 +57,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.validateOas(environment))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas(environment))
           .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
           .withBody(invalidOas)
         val result = route(fixture.application, request).value
@@ -76,7 +76,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Future.successful(Right(DeploymentsResponse(serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployNewApi(environment))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -103,7 +103,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Future.successful(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployNewApi(environment))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -127,7 +127,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployNewApi(environment))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -156,7 +156,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Future.successful(Right(deployment.toDetailsResponse)))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.getDeploymentDetails(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails(environment, serviceId))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -172,7 +172,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
         .thenReturn(Future.successful(Left(DeploymentNotFoundException.forService(environment, serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.getDeploymentDetails(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails(environment, serviceId))
           .withHeaders(authorizationHeader)
         val result = route(fixture.application, request).value
 
@@ -195,7 +195,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       ).thenReturn(Future.successful(Right(DeploymentsResponse(serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -228,7 +228,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       ).thenReturn(Future.successful(Left(DeploymentNotFoundException.forService(environment, serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -260,7 +260,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       ).thenReturn(Future.successful(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -284,7 +284,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment, serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -306,7 +306,7 @@ class SimpleApiDeploymentControllerV2Spec extends ControllerSpecBase {
 
 }
 
-private object SimpleApiDeploymentControllerV2Spec {
+private object SimpleApiDeploymentControllerSpec {
 
   val environment: String = "test-environment"
   val serviceId: String = "test-service-id"
