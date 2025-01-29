@@ -25,20 +25,16 @@ case class CreateMetadata(
   egress: String,
   passthrough: Boolean,
   status: String,
+  apiType: String = "SIMPLE",
   domain: String,
   subdomain: String,
-  backends: Seq[String],
-  egressMappings: Seq[EgressMapping],
-  prefixesToRemove: Seq[String]
-) {
-
-  // The HUB doesn't pass this to APIM
-  def apiType: String = "SIMPLE"
-
-}
+  backends: Seq[String] = Seq.empty,
+  egressMappings: Seq[EgressMapping] = Seq.empty,
+  prefixesToRemove: Seq[String] = Seq.empty
+)
 
 object CreateMetadata {
 
-  implicit val formatCreateMetadata: Format[CreateMetadata] = Json.format[CreateMetadata]
+  implicit val formatCreateMetadata: Format[CreateMetadata] = Json.using[Json.WithDefaultValues].format[CreateMetadata]
 
 }

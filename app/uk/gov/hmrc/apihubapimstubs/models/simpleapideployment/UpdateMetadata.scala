@@ -25,9 +25,9 @@ case class UpdateMetadata(
   egress: String,
   domain: String,
   subdomain: String,
-  backends: Seq[String],
-  egressMappings: Seq[EgressMapping],
-  prefixesToRemove: Seq[String]
+  backends: Seq[String] = Seq.empty,
+  egressMappings: Seq[EgressMapping] = Seq.empty,
+  prefixesToRemove: Seq[String] = Seq.empty
 ) {
 
   def toCreateMetadata(deployment: Deployment): CreateMetadata = {
@@ -50,6 +50,6 @@ case class UpdateMetadata(
 
 object UpdateMetadata {
 
-  implicit val formatUpdateMetadata: Format[UpdateMetadata] = Json.format[UpdateMetadata]
+  implicit val formatUpdateMetadata: Format[UpdateMetadata] = Json.using[Json.WithDefaultValues].format[UpdateMetadata]
 
 }

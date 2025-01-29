@@ -111,7 +111,7 @@ object Deployment extends OpenApiStuff {
       id = None,
       environment = environment,
       lineOfBusiness = metadata.lineOfBusiness,
-      name = metadata.name,
+      name = nameFor(metadata.lineOfBusiness, metadata.name),
       description = metadata.description,
       egress = metadata.egress,
       passthrough = metadata.passthrough,
@@ -128,6 +128,10 @@ object Deployment extends OpenApiStuff {
       buildVersion = "0.1.0",
       oas = oas
     )
+  }
+
+  def nameFor(lineOfBusiness: String, name: String): String = {
+    s"$lineOfBusiness-$name".toLowerCase
   }
 
   implicit val formatDeployment: Format[Deployment] = Json.format[Deployment]
