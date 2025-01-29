@@ -34,3 +34,12 @@ PUT         /platform-management/environments/:environment/v1/simple-api-deploym
 GET         /platform-management/environments/:environment/v1/oas-deployments                                   uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployments(environment: String)
 GET         /platform-management/environments/:environment/v1/oas-deployments/:id                               uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployment(environment: String, id: String)
 GET         /platform-management/environments/:environment/v1/oas-deployments/:id/oas                           uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiSpecification(environment: String, id: String)
+
+# IDMS routes - Platform Management API
+POST        /platform-management/environments/:environment/identity/clients                                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.createClient(environment: String)
+DELETE      /platform-management/environments/:environment/identity/clients/:id                                 uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.deleteClient(environment: String, id: String)
+GET         /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.getClientSecret(environment: String, id: String)
+POST        /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.generateNewClientSecret(environment: String, id: String)
+PUT         /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.addClientScope(environment: String, id: String, clientScopeId: String)
+DELETE      /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.deleteClientScope(environment: String, id: String, clientScopeId: String)
+GET         /platform-management/environments/:environment/identity/clients/:id/client-scopes                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.getClientScopes(environment: String, id: String)
