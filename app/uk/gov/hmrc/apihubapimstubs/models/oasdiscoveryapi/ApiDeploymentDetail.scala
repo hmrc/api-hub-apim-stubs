@@ -18,7 +18,7 @@ package uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi
 
 import play.api.libs.json.{Format, Json}
 
-import java.time.{Clock, Instant}
+import java.time.Instant
 
 case class ApiDeploymentDetail(
   id: String,
@@ -29,16 +29,6 @@ case class ApiDeploymentDetail(
 )
 
 object ApiDeploymentDetail {
-
-  def cannedResponse(id: String, clock: Clock): ApiDeploymentDetail = {
-    ApiDeploymentDetail(
-      id = id,
-      deploymentTimestamp = Instant.now(clock),
-      deploymentVersion = Some("0.1.0"),
-      oasVersion = Some("0.1.0"),
-      buildVersion = Some("0.1.0")
-    )
-  }
 
   implicit val formatApiDeploymentDetail: Format[ApiDeploymentDetail] = Json.format[ApiDeploymentDetail]
 
