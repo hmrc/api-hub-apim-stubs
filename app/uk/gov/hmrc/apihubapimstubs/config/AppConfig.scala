@@ -16,15 +16,43 @@
 
 package uk.gov.hmrc.apihubapimstubs.config
 
+import com.typesafe.config.Config
+
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{ConfigLoader, Configuration}
+import uk.gov.hmrc.apihubapimstubs.models.openapi.Server
+
+import scala.jdk.CollectionConverters.*
 
 @Singleton
 class AppConfig @Inject()(config: Configuration) {
+
+  import AppConfig.*
 
   val appName: String = config.get[String]("appName")
 
   val inboundClientId: String = config.get[String]("credentials.inbound.clientId")
   val inboundSecret: String = config.get[String]("credentials.inbound.secret")
+
+  val servers: Seq[Server] = config.get[Seq[Server]]("oas.servers")
+
+}
+
+object AppConfig {
+
+  implicit val serversConfigLoader: ConfigLoader[Seq[Server]] =
+    (rootConfig: Config, path: String) => {
+      rootConfig
+        .getConfigList(path)
+        .asScala
+        .toSeq
+        .map(
+          config =>
+            Server(
+              config.getString("description"),
+              config.getString("url")
+            )
+        )
+    }
 
 }

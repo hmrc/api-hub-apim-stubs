@@ -66,7 +66,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
       fixture.simpleApiDeploymentService.deployNewApi(environment, createMetadata, oas).map {
         result =>
           verify(fixture.autoPublishConnector).publish(eqTo(deploymentWithId.name))(any)
-          result mustBe Right(DeploymentsResponse(createMetadata.name))
+          result mustBe Right(DeploymentsResponse(deployment.name))
       }
     }
 
@@ -81,6 +81,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
 
     "must return a DeploymentFailedException with failures when the deployment already exists" in {
       val fixture = buildFixture()
+      val deploymentName = Deployment.nameFor(createMetadata.lineOfBusiness, createMetadata.name)
 
       when(fixture.deploymentsRepository.insert(any))
         .thenReturn(Future.successful(Left(DeploymentExistsException.forService(environment, serviceId))))
@@ -89,7 +90,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
         result =>
           result mustBe Left(
             DeploymentFailedException.forFailuresResponse(
-              FailuresResponse.deploymentAlreadyExists(serviceId, createMetadata.lineOfBusiness)
+              FailuresResponse.deploymentAlreadyExists(deploymentName, createMetadata.lineOfBusiness)
             )
           )
       )
@@ -259,7 +260,7 @@ private object SimpleApiDeploymentServiceSpec extends MockitoSugar {
     id = None,
     environment = environment,
     lineOfBusiness = createMetadata.lineOfBusiness,
-    name = createMetadata.name,
+    name = Deployment.nameFor(createMetadata.lineOfBusiness, createMetadata.name),
     description = createMetadata.description,
     egress = createMetadata.egress,
     passthrough = createMetadata.passthrough,

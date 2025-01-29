@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apihubapimstubs.models.deployment
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.apihubapimstubs.models.oasdiscoveryapi.{ApiDeployment, ApiDeploymentDetail}
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DetailsResponse, EgressMapping, UpdateMetadata}
 import uk.gov.hmrc.apihubapimstubs.models.utility.{MongoIdentifier, SemVer}
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
@@ -84,6 +85,23 @@ case class Deployment(
     )
   }
 
+  def toApiDeployment: ApiDeployment = {
+    ApiDeployment(
+      id = name,
+      deploymentTimestamp = deploymentTimestamp
+    )
+  }
+
+  def toApiDeploymentDetail: ApiDeploymentDetail = {
+    ApiDeploymentDetail(
+      id = name,
+      deploymentTimestamp = deploymentTimestamp,
+      deploymentVersion = Some(deploymentVersion),
+      oasVersion = Some(oasVersion),
+      buildVersion = Some(buildVersion)
+    )
+  }
+
 }
 
 object Deployment extends OpenApiStuff {
@@ -93,7 +111,7 @@ object Deployment extends OpenApiStuff {
       id = None,
       environment = environment,
       lineOfBusiness = metadata.lineOfBusiness,
-      name = metadata.name,
+      name = nameFor(metadata.lineOfBusiness, metadata.name),
       description = metadata.description,
       egress = metadata.egress,
       passthrough = metadata.passthrough,
@@ -110,6 +128,10 @@ object Deployment extends OpenApiStuff {
       buildVersion = "0.1.0",
       oas = oas
     )
+  }
+
+  def nameFor(lineOfBusiness: String, name: String): String = {
+    s"$lineOfBusiness-$name".toLowerCase
   }
 
   implicit val formatDeployment: Format[Deployment] = Json.format[Deployment]
