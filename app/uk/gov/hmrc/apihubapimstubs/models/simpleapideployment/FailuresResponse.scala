@@ -23,17 +23,6 @@ case class FailuresResponse(code: String, reason: String, errors: Option[Seq[Err
 
 object FailuresResponse {
 
-  val cannedResponse: FailuresResponse = FailuresResponse(
-    code = "BAD_REQUEST",
-    reason = "Validation Failed.",
-    errors = Some(Seq(
-      Error(
-        `type` = "JSON",
-        message = "malformed or unreadable swagger supplied"
-      )
-    ))
-  )
-
   val invalidOas: FailuresResponse = FailuresResponse(
     code = "BAD_REQUEST",
     reason = "Validation Failed."

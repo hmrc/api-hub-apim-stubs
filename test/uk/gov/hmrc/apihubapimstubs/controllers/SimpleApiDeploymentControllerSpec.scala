@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,18 @@
 
 package uk.gov.hmrc.apihubapimstubs.controllers
 
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
 import play.api.libs.json.Json
 import play.api.mvc.MultipartFormData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
+import uk.gov.hmrc.apihubapimstubs.models.exception.{DeploymentFailedException, DeploymentNotFoundException}
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.*
+
+import java.time.{Clock, Instant}
+import scala.concurrent.Future
 
 class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
 
@@ -30,8 +37,11 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     "must return 200 Ok when the OAS document is valid" in {
       val fixture = buildFixture()
 
+      when(fixture.simpleApiDeploymentService.validateOas(eqTo(environment), eqTo(oas)))
+        .thenReturn(Right(()))
+
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas())
+        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas(environment))
           .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
           .withBody(oas)
         val result = route(fixture.application, request).value
@@ -43,14 +53,17 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     "must return 400 BadRequest and a ValidationFailuresResponse when the OAS document is invalid" in {
       val fixture = buildFixture()
 
+      when(fixture.simpleApiDeploymentService.validateOas(eqTo(environment), eqTo(invalidOas)))
+        .thenReturn(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas)))
+
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas())
+        val request = FakeRequest(routes.SimpleApiDeploymentController.validateOas(environment))
           .withHeaders("Content-Type" -> "application/yaml", authorizationHeader)
-          .withBody("rhubarb")
+          .withBody(invalidOas)
         val result = route(fixture.application, request).value
 
         status(result) mustBe BAD_REQUEST
-        contentAsJson(result) mustBe Json.toJson(FailuresResponse.cannedResponse)
+        contentAsJson(result) mustBe Json.toJson(FailuresResponse.invalidOas)
       }
     }
   }
@@ -59,8 +72,11 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     "must return 200 Ok and a DeploymentsResponse when the request is valid" in {
       val fixture = buildFixture()
 
+      when(fixture.simpleApiDeploymentService.deployNewApi(eqTo(environment), eqTo(createMetadata), eqTo(oas))(any))
+        .thenReturn(Future.successful(Right(DeploymentsResponse(serviceId))))
+
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -83,14 +99,17 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     "must return 400 BadRequest and a ValidationFailuresResponse when the OAS document is invalid" in {
       val fixture = buildFixture()
 
+      when(fixture.simpleApiDeploymentService.deployNewApi(eqTo(environment), eqTo(createMetadata), eqTo(invalidOas))(any))
+        .thenReturn(Future.successful(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas))))
+
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
                 "metadata" -> Seq(Json.toJson(createMetadata).toString()),
-                "openapi" -> Seq("rhubarb")
+                "openapi" -> Seq(invalidOas)
               ),
               files = Seq.empty,
               badParts = Seq.empty
@@ -100,7 +119,7 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
         val result = route(fixture.application, request).value
 
         status(result) mustBe BAD_REQUEST
-        contentAsJson(result) mustBe Json.toJson(FailuresResponse.cannedResponse)
+        contentAsJson(result) mustBe Json.toJson(FailuresResponse.invalidOas)
       }
     }
 
@@ -108,7 +127,7 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
       val fixture = buildFixture()
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi())
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployNewApi(environment))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -128,14 +147,55 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     }
   }
 
-  "update" - {
+  "getDeploymentDetails" - {
+    "must return 200 Ok and a DetailsResponse when the deployment exists" in {
+      val fixture = buildFixture()
+      val deployment = buildDeployment(clock)
+
+      when(fixture.simpleApiDeploymentService.getDeploymentDetails(eqTo(environment), eqTo(serviceId)))
+        .thenReturn(Future.successful(Right(deployment.toDetailsResponse)))
+
+      running(fixture.application) {
+        val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails(environment, serviceId))
+          .withHeaders(authorizationHeader)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.toJson(deployment.toDetailsResponse)
+      }
+    }
+
+    "must return 404 Not Found when the deployment does not exist" in {
+      val fixture = buildFixture()
+
+      when(fixture.simpleApiDeploymentService.getDeploymentDetails(eqTo(environment), eqTo(serviceId)))
+        .thenReturn(Future.successful(Left(DeploymentNotFoundException.forService(environment, serviceId))))
+
+      running(fixture.application) {
+        val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails(environment, serviceId))
+          .withHeaders(authorizationHeader)
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe NOT_FOUND
+      }
+    }
+  }
+
+  "deployExistingApiWithNewConfiguration" - {
     "must return 200 Ok and a DeploymentsResponse when the request is valid" in {
       val fixture = buildFixture()
 
-      val serviceId = "test-service-id"
+      when(
+        fixture.simpleApiDeploymentService.deployExistingApiWithNewConfiguration(
+          eqTo(environment),
+          eqTo(serviceId),
+          eqTo(updateMetadata),
+          eqTo(oas)
+        )(any)
+      ).thenReturn(Future.successful(Right(DeploymentsResponse(serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -155,19 +215,58 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
       }
     }
 
-    "must return 400 BadRequest and a ValidationFailuresResponse when the OAS document is invalid" in {
+    "must return 404 Not Found when the deployment does not exist" in {
       val fixture = buildFixture()
 
-      val serviceId = "test-service-id"
+      when(
+        fixture.simpleApiDeploymentService.deployExistingApiWithNewConfiguration(
+          eqTo(environment),
+          eqTo(serviceId),
+          eqTo(updateMetadata),
+          eqTo(oas)
+        )(any)
+      ).thenReturn(Future.successful(Left(DeploymentNotFoundException.forService(environment, serviceId))))
 
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
               dataParts = Map(
                 "metadata" -> Seq(Json.toJson(updateMetadata).toString()),
-                "openapi" -> Seq("rhubarb")
+                "openapi" -> Seq(oas)
+              ),
+              files = Seq.empty,
+              badParts = Seq.empty
+            )
+          )
+
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "must return 400 BadRequest and a ValidationFailuresResponse when the OAS document is invalid" in {
+      val fixture = buildFixture()
+
+      when(
+        fixture.simpleApiDeploymentService.deployExistingApiWithNewConfiguration(
+          eqTo(environment),
+          eqTo(serviceId),
+          eqTo(updateMetadata),
+          eqTo(invalidOas)
+        )(any)
+      ).thenReturn(Future.successful(Left(DeploymentFailedException.forFailuresResponse(FailuresResponse.invalidOas))))
+
+      running(fixture.application) {
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
+          .withHeaders(authorizationHeader)
+          .withMultipartFormDataBody(
+            MultipartFormData(
+              dataParts = Map(
+                "metadata" -> Seq(Json.toJson(updateMetadata).toString()),
+                "openapi" -> Seq(invalidOas)
               ),
               files = Seq.empty,
               badParts = Seq.empty
@@ -177,17 +276,15 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
         val result = route(fixture.application, request).value
 
         status(result) mustBe BAD_REQUEST
-        contentAsJson(result) mustBe Json.toJson(FailuresResponse.cannedResponse)
+        contentAsJson(result) mustBe Json.toJson(FailuresResponse.invalidOas)
       }
     }
 
     "must return 400 Bad Request when the metadata is invalid" in {
       val fixture = buildFixture()
 
-      val serviceId = "test-service-id"
-
       running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId))
+        val request = FakeRequest(routes.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment, serviceId))
           .withHeaders(authorizationHeader)
           .withMultipartFormDataBody(
             MultipartFormData(
@@ -207,141 +304,68 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     }
   }
 
-  "deploymentFrom" - {
-    "must return 200 Ok and a DeploymentsResponse on success" in {
-      val fixture = buildFixture()
-
-      val deploymentFrom = DeploymentFrom(
-        env = "test-env",
-        serviceId = "test-service-id",
-        egress = "test-egress"
-      )
-
-      running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom())
-          .withHeaders(authorizationHeader)
-          .withJsonBody(Json.toJson(deploymentFrom))
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(DeploymentsResponse.apply(deploymentFrom.serviceId))
-      }
-    }
-
-    "must return 400 Bad Request if the request body is invalid" in {
-      val fixture = buildFixture()
-
-      running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom())
-          .withHeaders(authorizationHeader)
-          .withJsonBody(Json.obj())
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe BAD_REQUEST
-      }
-    }
-  }
-
-  "getDeploymentDetails" - {
-    "must return 200 Ok can a DetailsResponse" in {
-      val fixture = buildFixture()
-
-      running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.getDeploymentDetails("test-service-id"))
-          .withHeaders(authorizationHeader)
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(DetailsResponse.cannedResponse)
-      }
-    }
-  }
-
-  "getEgressGateways" - {
-    "must return 200 Ok and a canned response" in {
-      val fixture = buildFixture()
-
-      running(fixture.application) {
-        val request = FakeRequest(routes.SimpleApiDeploymentController.getEgressGateways())
-          .withHeaders(authorizationHeader)
-        val result = route(fixture.application, request).value
-
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(EgressGateway.cannedResponse)
-      }
-    }
-  }
-
 }
 
 private object SimpleApiDeploymentControllerSpec {
 
+  val environment: String = "test-environment"
+  val serviceId: String = "test-service-id"
+  val invalidOas: String = "xxx"
+  val oasVersion: String = "1.2.3"
+  val defaultVersion = "0.1.0"
+
+  val oas: String =
+    s"""
+       |openapi: 3.0.3
+       |info:
+       |  version: $oasVersion
+       |""".stripMargin
+
   val createMetadata: CreateMetadata = CreateMetadata(
-    lineOfBusiness = "test-line-of-business",
-    name = "test-name",
+    lineOfBusiness = "test-lob",
+    name = serviceId,
     description = "test-description",
     egress = "test-egress",
     passthrough = false,
     status = "test-status",
     domain = "test-domain",
     subdomain = "test-sub-domain",
-    backends = Seq("test-backend-1", "test-backend-2"),
-    egressMappings = Seq(EgressMapping("/from", "/to")),
-    prefixesToRemove = Seq("/remove-me")
+    backends = Seq("test-backend"),
+    egressMappings = Seq(EgressMapping("test-prefix", "test-egress-prefix")),
+    prefixesToRemove = Seq("test-prefix-to-remove")
   )
 
   val updateMetadata: UpdateMetadata = UpdateMetadata(
-    description = "test-description",
-    status = "test-status",
-    egress = "test-egress",
-    domain = "test-domain",
-    subdomain = "test-sub-domain",
-    backends = Seq("test-backend-1", "test-backend-2"),
-    egressMappings = Seq(EgressMapping("/from", "/to")),
-    prefixesToRemove = Seq("/remove-me")
+    description = "test-description-updated",
+    status = "test-status-updated",
+    egress = "test-egress-updated",
+    domain = "test-domain-updated",
+    subdomain = "test-sub-domain-updated",
+    backends = Seq("test-backend-updated"),
+    egressMappings = Seq(EgressMapping("test-prefix-updated", "test-egress-prefix-updated")),
+    prefixesToRemove = Seq("test-prefix-to-remove-updated")
   )
 
-  val oas: String =
-    """
-      |openapi: 3.0.0
-      |info:
-      |  version: 1.0.0
-      |  title: Single Path
-      |  description: This is a slimmed down single path version of the Petstore definition.
-      |servers:
-      |  - url: https://httpbin.org
-      |paths:
-      |  '/pet/{id}':
-      |    parameters:
-      |      - name: id
-      |        in: path
-      |        required: true
-      |        schema:
-      |          type: integer
-      |    put:
-      |      tags:
-      |        - pet
-      |      summary: Update a pet
-      |      description: This operation will update a pet in the database.
-      |      responses:
-      |        '400':
-      |          description: Invalid id value
-      |      security:
-      |        - apiKey: []
-      |    get:
-      |      tags:
-      |        - pet
-      |      summary: Find a pet
-      |      description: This operation will find a pet in the database.
-      |      responses:
-      |        '400':
-      |          description: Invalid status value
-      |      security: []
-      |components:
-      |  securitySchemes:
-      |    apiKey:
-      |      type: http
-      |      scheme: basic
-      |""".stripMargin
+  def buildDeployment(clock: Clock): Deployment = Deployment(
+    id = None,
+    environment = environment,
+    lineOfBusiness = createMetadata.lineOfBusiness,
+    name = createMetadata.name,
+    description = createMetadata.description,
+    egress = createMetadata.egress,
+    passthrough = createMetadata.passthrough,
+    status = createMetadata.status,
+    apiType = createMetadata.apiType,
+    domain = createMetadata.domain,
+    subdomain = createMetadata.subdomain,
+    backends = createMetadata.backends,
+    egressMappings = createMetadata.egressMappings,
+    prefixesToRemove = createMetadata.prefixesToRemove,
+    deploymentTimestamp = Instant.now(clock),
+    deploymentVersion = defaultVersion,
+    oasVersion = oasVersion,
+    buildVersion = defaultVersion,
+    oas = oas
+  )
 
 }

@@ -1,45 +1,23 @@
 # microservice specific routes
 
-# IDMS routes
-POST        /identity/clients                                       uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.createClient()
-DELETE      /identity/clients/:id                                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.deleteClient(id: String)
-GET         /identity/clients/:id/client-secret                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.getClientSecret(id: String)
-POST        /identity/clients/:id/client-secret                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.generateNewClientSecret(id: String)
-PUT         /identity/clients/:id/client-scopes/:clientScopeId      uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.addClientScope(id: String, clientScopeId: String)
-DELETE      /identity/clients/:id/client-scopes/:clientScopeId      uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.deleteClientScope(id: String, clientScopeId: String)
-GET         /identity/clients/:id/client-scopes                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.getClientScopes(id: String)
-
-# OAS Discovery API routes
-GET         /v1/oas-deployments                                     uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployments()
-GET         /v1/oas-deployments/:id                                 uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployment(id: String)
-GET         /v1/oas-deployments/:id/oas                             uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeploymentOAS(id: String)
-
-# Simple API Deployment routes
-POST        /v1/simple-api-deployment/validate                      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.validateOas()
-POST        /v1/simple-api-deployment/deployments                   uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deployNewApi()
-GET         /v1/simple-api-deployment/deployments/:serviceId        uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.getDeploymentDetails(serviceId: String)
-PUT         /v1/simple-api-deployment/deployments/:serviceId        uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(serviceId: String)
-PUT         /v1/simple-api-deployment/deployment-from               uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deploymentFrom()
-GET         /v1/simple-api-deployment/egress-gateways               uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.getEgressGateways()
-
 # Simple API Deployment routes - Platform Management API
-POST        /platform-management/environments/:environment/v1/simple-api-deployment/validate                    uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.validateOas(environment: String)
-POST        /platform-management/environments/:environment/v1/simple-api-deployment/deployments                 uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deployNewApi(environment: String)
-GET         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.getDeploymentDetails(environment: String, serviceId: String)
-PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deployExistingApiWithNewConfiguration(environment: String, serviceId: String)
-GET         /platform-management/environments/:environment/v1/simple-api-deployment/egress-gateways             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.getEgressGateways(environment: String)
-PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployment-from             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentControllerV2.deploymentFrom(environment: String)
+POST        /platform-management/environments/:environment/v1/simple-api-deployment/validate                    uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.validateOas(environment: String)
+POST        /platform-management/environments/:environment/v1/simple-api-deployment/deployments                 uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deployNewApi(environment: String)
+GET         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.getDeploymentDetails(environment: String, serviceId: String)
+PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployments/:serviceId      uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deployExistingApiWithNewConfiguration(environment: String, serviceId: String)
+GET         /platform-management/environments/:environment/v1/simple-api-deployment/egress-gateways             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.getEgressGateways(environment: String)
+PUT         /platform-management/environments/:environment/v1/simple-api-deployment/deployment-from             uk.gov.hmrc.apihubapimstubs.controllers.SimpleApiDeploymentController.deploymentFrom(environment: String)
 
 # OAS Discovery API routes - Platform Management API
-GET         /platform-management/environments/:environment/v1/oas-deployments                                   uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployments(environment: String)
-GET         /platform-management/environments/:environment/v1/oas-deployments/:id                               uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiDeployment(environment: String, id: String)
-GET         /platform-management/environments/:environment/v1/oas-deployments/:id/oas                           uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiControllerV2.getOpenApiSpecification(environment: String, id: String)
+GET         /platform-management/environments/:environment/v1/oas-deployments                                   uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployments(environment: String)
+GET         /platform-management/environments/:environment/v1/oas-deployments/:id                               uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiDeployment(environment: String, id: String)
+GET         /platform-management/environments/:environment/v1/oas-deployments/:id/oas                           uk.gov.hmrc.apihubapimstubs.controllers.OasDiscoveryApiController.getOpenApiSpecification(environment: String, id: String)
 
 # IDMS routes - Platform Management API
-POST        /platform-management/environments/:environment/identity/clients                                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.createClient(environment: String)
-DELETE      /platform-management/environments/:environment/identity/clients/:id                                 uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.deleteClient(environment: String, id: String)
-GET         /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.getClientSecret(environment: String, id: String)
-POST        /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.generateNewClientSecret(environment: String, id: String)
-PUT         /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.addClientScope(environment: String, id: String, clientScopeId: String)
-DELETE      /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.deleteClientScope(environment: String, id: String, clientScopeId: String)
-GET         /platform-management/environments/:environment/identity/clients/:id/client-scopes                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsControllerV2.getClientScopes(environment: String, id: String)
+POST        /platform-management/environments/:environment/identity/clients                                     uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.createClient(environment: String)
+DELETE      /platform-management/environments/:environment/identity/clients/:id                                 uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.deleteClient(environment: String, id: String)
+GET         /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.getClientSecret(environment: String, id: String)
+POST        /platform-management/environments/:environment/identity/clients/:id/client-secret                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.generateNewClientSecret(environment: String, id: String)
+PUT         /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.addClientScope(environment: String, id: String, clientScopeId: String)
+DELETE      /platform-management/environments/:environment/identity/clients/:id/client-scopes/:clientScopeId    uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.deleteClientScope(environment: String, id: String, clientScopeId: String)
+GET         /platform-management/environments/:environment/identity/clients/:id/client-scopes                   uk.gov.hmrc.apihubapimstubs.controllers.IdmsController.getClientScopes(environment: String, id: String)

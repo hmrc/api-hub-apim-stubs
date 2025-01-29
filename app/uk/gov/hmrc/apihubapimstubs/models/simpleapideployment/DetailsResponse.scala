@@ -33,19 +33,6 @@ case class DetailsResponse(
 
 object DetailsResponse {
 
-  val cannedResponse: DetailsResponse = DetailsResponse(
-    description = "A short description of the API",
-    status = "ALPHA",
-    apiType = "SIMPLE",
-    domain = "8",
-    subdomain = "8.1",
-    backends = Seq("NPS"),
-    egressMappings = Seq(EgressMapping("/mapping-from", "/mapping-to")),
-    prefixesToRemove = Seq("/v1"),
-    deploymentVersion = "0.1.0",
-    egress = "bpr",
-  )
-
   implicit val formatDetailsResponse: Format[DetailsResponse] = Json.format[DetailsResponse]
 
 }

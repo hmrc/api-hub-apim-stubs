@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class IdmsController @Inject()(
   authenticator: Authenticator
 )(implicit ec: ExecutionContext) extends BackendController(cc) with Logging {
 
-  def createClient(): Action[JsValue] = authenticator.async(parse.json) {
+  def createClient(environment: String): Action[JsValue] = authenticator.async(parse.json) {
     implicit request =>
       request.body.validate[Client] match {
         case JsSuccess(client, _) =>
@@ -42,16 +42,16 @@ class IdmsController @Inject()(
           identityService.createClient(Identity(client)).map {
             case Some(clientResponse) => Created(Json.toJson(clientResponse))
             case None =>
-              logger.info(s"Error creating new Identity object for application: ${client.applicationName}")
+              logger.error(s"Error creating new Identity object for application: ${client.applicationName}")
               InternalServerError
           }
         case e: JsError =>
-          logger.info(s"Error parsing request body: ${JsError.toJson(e)}")
+          logger.warn(s"Error parsing request body: ${JsError.toJson(e)}")
           Future.successful(BadRequest)
       }
   }
 
-  def deleteClient(id: String): Action[AnyContent] = authenticator.async {
+  def deleteClient(environment: String, id: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Deleting client $id")
     identityService.deleteClient(id).map {
       case Some(()) => Ok
@@ -59,7 +59,7 @@ class IdmsController @Inject()(
     }
   }
 
-  def getClientSecret(id: String): Action[AnyContent] = authenticator.async {
+  def getClientSecret(environment: String, id: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Getting secret for client id = $id")
     identityService.getClientSecret(id).map {
       case Some(secret) => Ok(Json.toJson(secret))
@@ -67,7 +67,7 @@ class IdmsController @Inject()(
     }
   }
 
-  def generateNewClientSecret(id: String): Action[AnyContent] = authenticator.async {
+  def generateNewClientSecret(environment: String, id: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Creating new client secret for client id = $id")
     identityService.generateNewClientSecret(id).map {
       case Some(secret) => Ok(Json.toJson(secret))
@@ -75,7 +75,7 @@ class IdmsController @Inject()(
     }
   }
 
-  def addClientScope(id: String, clientScopeId: String): Action[AnyContent] = authenticator.async {
+  def addClientScope(environment: String, id: String, clientScopeId: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Adding client scope $id $clientScopeId")
     identityService.addClientScope(id, clientScopeId).map {
       case Some(_) => Ok
@@ -83,7 +83,7 @@ class IdmsController @Inject()(
     }
   }
 
-  def deleteClientScope(id: String, clientScopeId: String): Action[AnyContent] = authenticator.async {
+  def deleteClientScope(environment: String, id: String, clientScopeId: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Deleting client scope $id $clientScopeId")
     identityService.deleteClientScope(id, clientScopeId).map {
       case Some(_) => Ok
@@ -91,7 +91,7 @@ class IdmsController @Inject()(
     }
   }
 
-  def getClientScopes(id: String): Action[AnyContent] = authenticator.async {
+  def getClientScopes(environment: String, id: String): Action[AnyContent] = authenticator.async {
     logger.info(s"Getting scopes for client id $id")
     identityService.getClient(id).map {
       case Some(identity) => Ok(Json.toJson(identity.scopes.map(ClientScope(_))))
