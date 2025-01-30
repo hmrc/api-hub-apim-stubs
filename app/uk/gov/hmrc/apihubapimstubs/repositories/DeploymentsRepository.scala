@@ -125,11 +125,16 @@ class DeploymentsRepository @Inject()(mongoComponent: MongoComponent)(implicit e
         .toFuture()
     } map {
       result =>
-        Right(
-          deployment.copy(
-            id = Some(result.getUpsertedId.asObjectId().getValue.toString)
+        if (result.getMatchedCount == 0) {
+          Right(
+            deployment.copy(
+              id = Some(result.getUpsertedId.asObjectId().getValue.toString)
+            )
           )
-        )
+        }
+        else {
+          Right(deployment)
+        }
     }
   }
 
