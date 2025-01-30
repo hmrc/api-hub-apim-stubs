@@ -111,4 +111,31 @@ class DeploymentsRepository @Inject()(mongoComponent: MongoComponent)(implicit e
     }
   }
 
+  def upsert(deployment: Deployment): Future[Either[ApimStubException, Deployment]] = {
+    Mdc.preservingMdc {
+      collection
+        .replaceOne(
+          filter = Filters.and(
+            Filters.equal("name", deployment.name),
+            Filters.equal("environment", deployment.environment)
+          ),
+          replacement = deployment,
+          options = ReplaceOptions().upsert(true)
+        )
+        .toFuture()
+    } map {
+      result =>
+        if (result.getMatchedCount == 0) {
+          Right(deployment.copy())
+        }
+        else {
+          Right(
+            deployment.copy(
+              id = Some(result.getUpsertedId.asObjectId().getValue.toString)
+            )
+          )
+        }
+    }
+  }
+
 }

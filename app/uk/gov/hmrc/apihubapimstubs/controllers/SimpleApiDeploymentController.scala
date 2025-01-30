@@ -23,7 +23,7 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, MultipartFormData}
 import uk.gov.hmrc.apihubapimstubs.controllers.auth.Authenticator
 import uk.gov.hmrc.apihubapimstubs.models.exception.{ApimStubException, DeploymentFailedException, DeploymentNotFoundException}
-import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DeploymentsResponse, EgressGateway, FailuresResponse, UpdateMetadata}
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DeploymentFrom, DeploymentsResponse, EgressGateway, FailuresResponse, UpdateMetadata}
 import uk.gov.hmrc.apihubapimstubs.services.SimpleApiDeploymentService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -101,9 +101,19 @@ class SimpleApiDeploymentController @Inject()(
     Ok(Json.toJson(service.getEgressGateways(environment)))
   }
 
-  def deploymentFrom(environment: String): Action[JsValue] = authenticator(parse.json) {
+  def deploymentFrom(environment: String): Action[JsValue] = authenticator(parse.json).async {
     implicit request =>
-      NotImplemented
+      request.body.validate[DeploymentFrom] match {
+        case JsSuccess(deploymentFrom, _) =>
+          service.deploymentFrom(environment, deploymentFrom).map{
+            case Right(deploymentsResponse) => Ok(Json.toJson(deploymentsResponse))
+            case Left(e: DeploymentNotFoundException) => NotFound
+            case Left(e) => throw e
+          }
+        case e: JsError =>
+          logger.warn(s"Deployment from error parsing DeploymentFrom ${Json.prettyPrint(JsError.toJson(e))}")
+          Future.successful(BadRequest)
+      }
   }
 
 }

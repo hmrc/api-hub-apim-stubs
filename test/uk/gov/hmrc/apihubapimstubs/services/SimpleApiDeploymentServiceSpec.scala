@@ -200,6 +200,45 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
     }
   }
 
+  "deploymentFrom" - {
+    "must store the new deployment in the to environment and return the DeploymentsResponse on success" in {
+      val fixture = buildFixture()
+      val environmentTo = "test-environment-to"
+      val egressTo = "test-egress-to"
+      val existing = buildDeploymentWithId(fixture)
+      val promoted = existing.promoteTo(environmentTo, egressTo, clock)
+      val promotedWithId = promoted.copy(id = Some(s"$deploymentId-promoted"))
+      val deploymentFrom = DeploymentFrom(existing.environment, existing.name, egressTo)
+
+      when(fixture.deploymentsRepository.findInEnvironment(eqTo(existing.environment), eqTo(existing.name)))
+        .thenReturn(Future.successful(Right(existing)))
+
+      when(fixture.deploymentsRepository.upsert(promoted))
+        .thenReturn(Future.successful(Right(promotedWithId)))
+
+      fixture.simpleApiDeploymentService.deploymentFrom(environmentTo, deploymentFrom).map(
+        result =>
+          result mustBe Right(DeploymentsResponse(promoted.name))
+      )
+    }
+
+    "must return DeploymentNotFoundException if the from deployment does not exist" in {
+      val fixture = buildFixture()
+      val environmentTo = "test-environment-to"
+      val egressTo = "test-egress-to"
+      val deploymentFrom = DeploymentFrom(environment, serviceId, egressTo)
+      val expected = DeploymentNotFoundException.forService(environment, serviceId)
+
+      when(fixture.deploymentsRepository.findInEnvironment(eqTo(environment), eqTo(serviceId)))
+        .thenReturn(Future.successful(Left(expected)))
+
+      fixture.simpleApiDeploymentService.deploymentFrom(environmentTo, deploymentFrom).map(
+        result =>
+          result mustBe Left(expected)
+      )
+    }
+  }
+
   private def buildFixture(): Fixture = {
     val oasTransformer = new OasTransformer(clock)
     val deploymentsRepository = mock[DeploymentsRepository]
