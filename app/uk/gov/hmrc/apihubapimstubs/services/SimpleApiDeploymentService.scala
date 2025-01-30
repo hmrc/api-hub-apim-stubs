@@ -22,7 +22,7 @@ import play.api.Logging
 import uk.gov.hmrc.apihubapimstubs.connectors.AutoPublishConnector
 import uk.gov.hmrc.apihubapimstubs.models.deployment.Deployment
 import uk.gov.hmrc.apihubapimstubs.models.exception.{ApimStubException, DeploymentExistsException, DeploymentFailedException}
-import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DeploymentsResponse, DetailsResponse, EgressGateway, FailuresResponse, UpdateMetadata}
+import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.{CreateMetadata, DeploymentFrom, DeploymentsResponse, DetailsResponse, EgressGateway, FailuresResponse, UpdateMetadata}
 import uk.gov.hmrc.apihubapimstubs.repositories.DeploymentsRepository
 import uk.gov.hmrc.apihubapimstubs.util.{ExceptionRaising, OpenApiStuff}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -85,6 +85,17 @@ class SimpleApiDeploymentService @Inject()(
 
   def getEgressGateways(environment: String): Seq[EgressGateway] = {
     EgressGateway.cannedResponse
+  }
+
+  def deploymentFrom(
+    environmentTo: String,
+    deploymentFrom: DeploymentFrom
+  ): Future[Either[ApimStubException, DeploymentsResponse]] = {
+    (for {
+      existing <- EitherT(deploymentsRepository.findInEnvironment(deploymentFrom.env, deploymentFrom.serviceId))
+      promoted = existing.promoteTo(environmentTo, deploymentFrom.egress, clock)
+      promoted <- EitherT(deploymentsRepository.upsert(promoted))
+    } yield DeploymentsResponse(promoted.name)).value
   }
 
   private def insertDeployment(deployment: Deployment): Future[Either[ApimStubException, Deployment]] = {

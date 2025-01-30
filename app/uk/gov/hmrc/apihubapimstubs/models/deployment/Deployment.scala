@@ -102,6 +102,15 @@ case class Deployment(
     )
   }
 
+  def promoteTo(environmentTo: String, egress: String, clock: Clock): Deployment = {
+    this.copy(
+      id = None,
+      environment = environmentTo,
+      egress = egress,
+      deploymentTimestamp = Instant.now(clock)
+    )
+  }
+
 }
 
 object Deployment extends OpenApiStuff {

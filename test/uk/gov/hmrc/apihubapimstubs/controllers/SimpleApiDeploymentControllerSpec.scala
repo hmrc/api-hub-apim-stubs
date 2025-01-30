@@ -304,6 +304,55 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
     }
   }
 
+  "deploymentFrom" - {
+    "must return 200 Ok and a DeploymentsResponse when the request is valid" in {
+      val fixture = buildFixture()
+      val deploymentFrom = DeploymentFrom("environment-to", serviceId, "egress-to")
+
+      when(fixture.simpleApiDeploymentService.deploymentFrom(eqTo(environment), eqTo(deploymentFrom)))
+        .thenReturn(Future.successful(Right(DeploymentsResponse(serviceId))))
+
+      running(fixture.application) {
+        val request  = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom(environment))
+          .withHeaders(authorizationHeader)
+          .withBody(Json.toJson(deploymentFrom))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.toJson(DeploymentsResponse(serviceId))
+      }
+    }
+
+    "must return 404 Not Found when the from deployment does not exist" in {
+      val fixture = buildFixture()
+      val deploymentFrom = DeploymentFrom("environment-to", serviceId, "egress-to")
+
+      when(fixture.simpleApiDeploymentService.deploymentFrom(eqTo(environment), eqTo(deploymentFrom)))
+        .thenReturn(Future.successful(Left(DeploymentNotFoundException.forService(environment, serviceId))))
+
+      running(fixture.application) {
+        val request  = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom(environment))
+          .withHeaders(authorizationHeader)
+          .withBody(Json.toJson(deploymentFrom))
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "must return 400 Bad Request when the request body is invalid" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val request  = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom(environment))
+          .withHeaders(authorizationHeader)
+          .withBody(Json.obj())
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe BAD_REQUEST
+      }
+    }
+  }
 }
 
 private object SimpleApiDeploymentControllerSpec {
