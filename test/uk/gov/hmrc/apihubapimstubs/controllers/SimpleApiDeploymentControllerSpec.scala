@@ -339,6 +339,19 @@ class SimpleApiDeploymentControllerSpec extends ControllerSpecBase {
         status(result) mustBe NOT_FOUND
       }
     }
+
+    "must return 400 Bad Request when the request body is invalid" in {
+      val fixture = buildFixture()
+
+      running(fixture.application) {
+        val request  = FakeRequest(routes.SimpleApiDeploymentController.deploymentFrom(environment))
+          .withHeaders(authorizationHeader)
+          .withBody(Json.obj())
+        val result = route(fixture.application, request).value
+
+        status(result) mustBe BAD_REQUEST
+      }
+    }
   }
 }
 
