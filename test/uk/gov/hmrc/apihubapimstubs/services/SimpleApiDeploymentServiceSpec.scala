@@ -208,7 +208,7 @@ class SimpleApiDeploymentServiceSpec extends AsyncFreeSpec with Matchers with Mo
       val existing = buildDeploymentWithId(fixture)
       val promoted = existing.promoteTo(environmentTo, egressTo, clock)
       val promotedWithId = promoted.copy(id = Some(s"$deploymentId-promoted"))
-      val deploymentFrom = DeploymentFrom(existing.environment, existing.name, egressTo)
+      val deploymentFrom = DeploymentFrom("env/" + existing.environment, existing.name, egressTo)
 
       when(fixture.deploymentsRepository.findInEnvironment(eqTo(existing.environment), eqTo(existing.name)))
         .thenReturn(Future.successful(Right(existing)))
