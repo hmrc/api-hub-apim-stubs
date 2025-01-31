@@ -92,10 +92,14 @@ class SimpleApiDeploymentService @Inject()(
     deploymentFrom: DeploymentFrom
   ): Future[Either[ApimStubException, DeploymentsResponse]] = {
     (for {
-      existing <- EitherT(deploymentsRepository.findInEnvironment(deploymentFrom.env, deploymentFrom.serviceId))
+      existing <- EitherT(deploymentsRepository.findInEnvironment(removeEnvNamePrefix(deploymentFrom.env), deploymentFrom.serviceId))
       promoted = existing.promoteTo(environmentTo, deploymentFrom.egress, clock)
       promoted <- EitherT(deploymentsRepository.upsert(promoted))
     } yield DeploymentsResponse(promoted.name)).value
+  }
+
+  private def removeEnvNamePrefix(name: String): String = {
+    name.replaceFirst("^env/", "")
   }
 
   private def insertDeployment(deployment: Deployment): Future[Either[ApimStubException, Deployment]] = {
