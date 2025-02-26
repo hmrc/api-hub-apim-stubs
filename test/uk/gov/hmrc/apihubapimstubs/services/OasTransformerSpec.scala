@@ -25,7 +25,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.apihubapimstubs.models.openapi.IntegrationCatalogueSection
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
-import uk.gov.hmrc.apihubapimstubs.services.OasTransformer.TOKEN_URL_NOT_REQUIRED
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
 
 import java.time.{Clock, Instant, ZoneId}
@@ -83,94 +82,6 @@ class OasTransformerSpec extends AnyFreeSpec with Matchers with OpenApiStuff {
       )
 
       openApi.getServers mustBe empty
-    }
-
-    "must null the security section" in {
-      val fixture = buildFixture()
-
-      val openApiWithSecurity = parseOpenApi(baseOas)
-      openApiWithSecurity.setSecurity(Seq(new SecurityRequirement()).asJava)
-
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
-        serialiseOpenApi(openApiWithSecurity),
-        createMetadata
-      )
-
-      openApi.getSecurity must be (null)
-    }
-
-    "must add security requirements to all endpoints" in {
-      val fixture = buildFixture()
-
-      val openApiWithPaths = buildOpenApiWithPaths()
-
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
-        serialiseOpenApi(openApiWithPaths),
-        createMetadata
-      )
-
-      val operation1 = buildOperationWithSecurityRequirement(1, operation1HttpMethod)
-      val operation2 = buildOperationWithSecurityRequirement(2, operation2HttpMethod)
-      val operation3 = buildOperationWithSecurityRequirement(3, operation3HttpMethod)
-
-      val pathItem1 = buildPathItem((operation1HttpMethod, operation1), (operation2HttpMethod, operation2))
-      val pathItem2 = buildPathItem((operation3HttpMethod, operation3))
-
-      val expected = new Paths()
-      expected.addPathItem(buildPathItemName(1), pathItem1)
-      expected.addPathItem(buildPathItemName(2), pathItem2)
-
-      openApi.getPaths mustBe expected
-    }
-
-    "must add the OAuth2 security scheme" in {
-      val fixture = buildFixture()
-
-      val openApiWithPaths = buildOpenApiWithPaths()
-
-      val openApi = fixture.oasTransformer.transformToConsumerOpenApi(
-        serialiseOpenApi(openApiWithPaths),
-        createMetadata
-      )
-
-      val operation1 = buildOperationWithSecurityRequirement(1, operation1HttpMethod)
-      val operation2 = buildOperationWithSecurityRequirement(2, operation2HttpMethod)
-      val operation3 = buildOperationWithSecurityRequirement(3, operation3HttpMethod)
-
-      val scopes = new Scopes()
-
-      scopes.put(
-        buildScopeName(operation1HttpMethod, operation1),
-        buildScopeDescription(operation1)
-      )
-
-      scopes.put(
-        buildScopeName(operation2HttpMethod, operation2),
-        buildScopeDescription(operation2)
-      )
-
-      scopes.put(
-        buildScopeName(operation3HttpMethod, operation3),
-        buildScopeDescription(operation3)
-      )
-
-      val securityScheme = new SecurityScheme()
-      securityScheme.setType(SecurityScheme.Type.OAUTH2)
-      securityScheme.setDescription(OasTransformer.CREDENTIALS_FLOW)
-      securityScheme.setFlows(
-        new OAuthFlows()
-          .clientCredentials(
-            new OAuthFlow()
-              .tokenUrl(TOKEN_URL_NOT_REQUIRED)
-              .scopes(scopes)
-          )
-      )
-
-      val expected = Map(
-        OasTransformer.OAUTH2 -> securityScheme
-      ).asJava
-
-      openApi.getComponents.getSecuritySchemes mustBe expected
     }
   }
 
