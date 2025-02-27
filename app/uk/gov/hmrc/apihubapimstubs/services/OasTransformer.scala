@@ -19,7 +19,6 @@ package uk.gov.hmrc.apihubapimstubs.services
 import com.google.inject.{Inject, Singleton}
 import io.swagger.v3.oas.models.*
 import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.security.*
 import uk.gov.hmrc.apihubapimstubs.models.openapi.IntegrationCatalogueSection
 import uk.gov.hmrc.apihubapimstubs.models.simpleapideployment.CreateMetadata
 import uk.gov.hmrc.apihubapimstubs.util.OpenApiStuff
@@ -43,8 +42,6 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
     setComponents(openApi)
     setPaths(openApi)
     clearServers(openApi)
-    setSecurity(openApi)
-    generatePathSecurityAndSecuritySchemes(openApi, createMetadata)
 
     openApi
   }
@@ -67,84 +64,6 @@ class OasTransformer @Inject()(clock: Clock) extends OpenApiStuff {
     openApi.setServers(Seq.empty.asJava)
   }
 
-  private def setSecurity(openApi: OpenAPI): Unit = {
-    openApi.setSecurity(null)
-  }
-
-  private def generatePathSecurityAndSecuritySchemes(
-    openApi: OpenAPI,
-    createMetadata: CreateMetadata
-  ): Unit = {
-    val scopeDefinitions = openApi.getPaths.asScala.toSeq
-      .flatMap {
-        case (name, item) =>
-          item.readOperationsMap().asScala
-            .map {
-              case (method, operation) =>
-                val scopeName = buildScopeName(method, operation, createMetadata)
-                operation.security(Seq(buildSecurityRequirement(Seq(scopeName))).asJava)
-                ScopeDefinition(scopeName, buildScopeDescription(operation, createMetadata))
-            }
-      }
-
-    openApi.getComponents
-      .addSecuritySchemes(
-        OAUTH2,
-        buildOAuth2SecurityScheme(scopeDefinitions)
-      )
-  }
-
-  private def buildScopeName(
-    method: PathItem.HttpMethod,
-    operation: Operation,
-    createMetadata: CreateMetadata
-  ): String = {
-    String.format(
-      "%s:%s-%s-%s",
-      method.name.toLowerCase,
-      createMetadata.lineOfBusiness.toLowerCase,
-      createMetadata.name,
-      operation.getOperationId
-    )
-  }
-
-  private def buildScopeDescription(
-    operation: Operation,
-    createMetadata: CreateMetadata
-  ): String = {
-    String.format(
-      "Scope for %s %s %s",
-      createMetadata.lineOfBusiness,
-      createMetadata.name,
-      operation.getOperationId
-    )
-  }
-
-  private def buildSecurityRequirement(scopes: Seq[String]): SecurityRequirement = {
-    new SecurityRequirement().addList(OAUTH2, scopes.asJava)
-  }
-
-  private def buildOAuth2SecurityScheme(scopeDefinitions: Seq[ScopeDefinition]): SecurityScheme = {
-    val scopes = new Scopes()
-
-    scopeDefinitions.foreach(
-      scopeDefinition =>
-        scopes.put(scopeDefinition.scope, scopeDefinition.description)
-    )
-
-    new SecurityScheme()
-      .`type`(SecurityScheme.Type.OAUTH2)
-      .description(CREDENTIALS_FLOW)
-      .flows(
-        new OAuthFlows()
-          .clientCredentials(
-            new OAuthFlow()
-              .tokenUrl(TOKEN_URL_NOT_REQUIRED)
-              .scopes(scopes)
-          )
-      )
-  }
-
 }
 
 object OasTransformer {
@@ -153,7 +72,5 @@ object OasTransformer {
   val CREDENTIALS_FLOW = "OAuth2 Client Credentials Flow"
   val TOKEN_URL_NOT_REQUIRED = "/tokenUrl/not-required"
   val X_INTEGRATION_CATALOGUE = "x-integration-catalogue"
-
-  private case class ScopeDefinition(scope: String, description: String)
 
 }
