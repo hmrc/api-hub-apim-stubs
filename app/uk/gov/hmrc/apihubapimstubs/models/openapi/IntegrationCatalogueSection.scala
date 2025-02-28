@@ -29,12 +29,14 @@ case class IntegrationCatalogueSection(
   platform: String,
   backends: Seq[String],
   domain: String,
-  @JsonProperty("sub-domain") subdomain: String
+  @JsonProperty("sub-domain") subdomain: String,
+  @JsonProperty("API-Generation") apiGeneration: String
 )
 
 object IntegrationCatalogueSection {
 
   val hipPlatform = "HIP"
+  val v2 = "V2"
 
   def apply(metadata: CreateMetadata, clock: Clock): IntegrationCatalogueSection = {
     IntegrationCatalogueSection(
@@ -45,7 +47,8 @@ object IntegrationCatalogueSection {
       platform = hipPlatform,
       backends = metadata.backends,
       domain = metadata.domain,
-      subdomain = metadata.subdomain
+      subdomain = metadata.subdomain,
+      apiGeneration = v2
     )
   }
 
