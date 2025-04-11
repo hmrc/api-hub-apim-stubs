@@ -27,7 +27,8 @@ case class UpdateMetadata(
   subdomain: String,
   backends: Seq[String] = Seq.empty,
   egressMappings: Seq[EgressMapping] = Seq.empty,
-  prefixesToRemove: Seq[String] = Seq.empty
+  prefixesToRemove: Seq[String] = Seq.empty,
+  basePath: String
 ) {
 
   def toCreateMetadata(deployment: Deployment): CreateMetadata = {
@@ -42,7 +43,8 @@ case class UpdateMetadata(
       subdomain = subdomain,
       backends = backends,
       egressMappings = egressMappings,
-      prefixesToRemove = prefixesToRemove
+      prefixesToRemove = prefixesToRemove,
+      basePath = basePath
     )
   }
 

@@ -30,7 +30,8 @@ case class CreateMetadata(
   subdomain: String,
   backends: Seq[String] = Seq.empty,
   egressMappings: Seq[EgressMapping] = Seq.empty,
-  prefixesToRemove: Seq[String] = Seq.empty
+  prefixesToRemove: Seq[String] = Seq.empty,
+  basePath: String
 )
 
 object CreateMetadata {

@@ -381,7 +381,8 @@ private object SimpleApiDeploymentControllerSpec {
     subdomain = "test-sub-domain",
     backends = Seq("test-backend"),
     egressMappings = Seq(EgressMapping("test-prefix", "test-egress-prefix")),
-    prefixesToRemove = Seq("test-prefix-to-remove")
+    prefixesToRemove = Seq("test-prefix-to-remove"),
+    basePath = "test-base-path"
   )
 
   val updateMetadata: UpdateMetadata = UpdateMetadata(
@@ -392,7 +393,8 @@ private object SimpleApiDeploymentControllerSpec {
     subdomain = "test-sub-domain-updated",
     backends = Seq("test-backend-updated"),
     egressMappings = Seq(EgressMapping("test-prefix-updated", "test-egress-prefix-updated")),
-    prefixesToRemove = Seq("test-prefix-to-remove-updated")
+    prefixesToRemove = Seq("test-prefix-to-remove-updated"),
+    basePath = "test-base-path"
   )
 
   def buildDeployment(clock: Clock): Deployment = Deployment(

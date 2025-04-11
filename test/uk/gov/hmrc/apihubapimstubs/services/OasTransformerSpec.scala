@@ -108,7 +108,8 @@ private object OasTransformerSpec extends OpenApiStuff {
     subdomain = "test-sub-domain",
     backends = Seq("test-backend-1", "test-backend-2"),
     egressMappings = Seq.empty,
-    prefixesToRemove = Seq.empty
+    prefixesToRemove = Seq.empty,
+    basePath = "test-base-path"
   )
 
   val baseOas = "openapi: 3.0.3"
