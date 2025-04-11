@@ -43,7 +43,8 @@ case class Deployment(
   deploymentVersion: String,
   oasVersion: String,
   buildVersion: String,
-  oas: String
+  oas: String,
+  basePath: String = "unknown"
 ) extends MongoIdentifier with OpenApiStuff {
 
   def update(metadata: UpdateMetadata, oas: String, clock: Clock): Deployment = {
@@ -66,7 +67,8 @@ case class Deployment(
       deploymentVersion = SemVer(deploymentVersion).incrementMinor().version,
       oasVersion = oasVersion(oas).getOrElse("1.0.0"),
       buildVersion = buildVersion,
-      oas = oas
+      oas = oas,
+      basePath = metadata.basePath
     )
   }
 
@@ -135,7 +137,8 @@ object Deployment extends OpenApiStuff {
       deploymentVersion = "0.1.0",
       oasVersion = oasVersion(oas).getOrElse("1.0.0"),
       buildVersion = "0.1.0",
-      oas = oas
+      oas = oas,
+      basePath = metadata.basePath
     )
   }
 
@@ -143,6 +146,6 @@ object Deployment extends OpenApiStuff {
     s"$lineOfBusiness-$name".toLowerCase
   }
 
-  implicit val formatDeployment: Format[Deployment] = Json.format[Deployment]
+  implicit val formatDeployment: Format[Deployment] = Json.using[Json.WithDefaultValues].format[Deployment]
 
 }
